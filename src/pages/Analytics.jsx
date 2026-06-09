@@ -266,15 +266,15 @@ export default function Analytics() {
           <h2 className="font-semibold text-slate-900 mb-5">Age Groups</h2>
           <div className="space-y-4">
             {audienceData.ageGroups.map(g => (
-              <div key={g.label}>
+              <div key={g.group}>
                 <div className="flex items-center justify-between text-sm mb-1.5">
-                  <span className="font-medium text-slate-700">{g.label}</span>
-                  <span className="text-slate-500 font-medium">{g.pct}%</span>
+                  <span className="font-medium text-slate-700">{g.group}</span>
+                  <span className="text-slate-500 font-medium">{g.percentage}%</span>
                 </div>
                 <div className="h-2.5 bg-slate-100 rounded-full overflow-hidden">
                   <div
                     className="h-2.5 rounded-full bg-gradient-to-r from-violet-500 to-pink-500 transition-all duration-500"
-                    style={{ width: `${g.pct}%` }}
+                    style={{ width: `${g.percentage}%` }}
                   />
                 </div>
               </div>
@@ -285,23 +285,26 @@ export default function Analytics() {
         <div className="card">
           <h2 className="font-semibold text-slate-900 mb-5">Top Countries</h2>
           <div className="space-y-4">
-            {audienceData.countries.map(c => (
-              <div key={c.code}>
-                <div className="flex items-center justify-between text-sm mb-1.5">
-                  <div className="flex items-center gap-2">
-                    <span className="text-base leading-none">{c.flag}</span>
-                    <span className="font-medium text-slate-700">{c.name}</span>
+            {audienceData.topCountries.map(c => {
+              const flagEmoji = { US: '🇺🇸', GB: '🇬🇧', CA: '🇨🇦', AU: '🇦🇺', IN: '🇮🇳' }
+              return (
+                <div key={c.flag}>
+                  <div className="flex items-center justify-between text-sm mb-1.5">
+                    <div className="flex items-center gap-2">
+                      <span className="text-base leading-none">{flagEmoji[c.flag] ?? c.flag}</span>
+                      <span className="font-medium text-slate-700">{c.country}</span>
+                    </div>
+                    <span className="text-slate-500 font-medium">{c.percentage}%</span>
                   </div>
-                  <span className="text-slate-500 font-medium">{c.pct}%</span>
+                  <div className="h-2.5 bg-slate-100 rounded-full overflow-hidden">
+                    <div
+                      className="h-2.5 rounded-full bg-gradient-to-r from-blue-500 to-cyan-400 transition-all duration-500"
+                      style={{ width: `${c.percentage}%` }}
+                    />
+                  </div>
                 </div>
-                <div className="h-2.5 bg-slate-100 rounded-full overflow-hidden">
-                  <div
-                    className="h-2.5 rounded-full bg-gradient-to-r from-blue-500 to-cyan-400 transition-all duration-500"
-                    style={{ width: `${c.pct}%` }}
-                  />
-                </div>
-              </div>
-            ))}
+              )
+            })}
           </div>
         </div>
       </div>
