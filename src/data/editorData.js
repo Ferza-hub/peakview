@@ -49,16 +49,16 @@ export const initialTracks = [
 ]
 
 export const mediaFiles = [
-  { id: 'm1', name: 'Main Interview.mp4', type: 'video', duration: '12:34', color: '#7C3AED' },
-  { id: 'm2', name: 'B-Roll Office.mp4',  type: 'video', duration: '2:15',  color: '#6D28D9' },
-  { id: 'm3', name: 'Drone Shots.mp4',    type: 'video', duration: '4:22',  color: '#5B21B6' },
-  { id: 'm4', name: 'Product Demo.mp4',   type: 'video', duration: '3:10',  color: '#7C3AED' },
-  { id: 'm5', name: 'BG Music Lo-Fi.mp3', type: 'audio', duration: '3:32',  color: '#10B981' },
-  { id: 'm6', name: 'Voiceover Final.mp3',type: 'audio', duration: '8:45',  color: '#F59E0B' },
-  { id: 'm7', name: 'SFX Whoosh.wav',     type: 'audio', duration: '0:02',  color: '#06B6D4' },
-  { id: 'm8', name: 'Thumbnail BG.png',   type: 'image', duration: '—',     color: '#EC4899' },
-  { id: 'm9', name: 'Logo Animated.mov',  type: 'video', duration: '0:05',  color: '#0E7490' },
-  { id: 'm10', name: 'Subtitles EN.srt',  type: 'subtitle', duration: '—',  color: '#EF4444' },
+  { id: 'm1', name: 'Main Interview.mp4',  type: 'video',    duration: '12:34', color: '#7C3AED', thumb: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=320&auto=format&fit=crop&q=80' },
+  { id: 'm2', name: 'B-Roll Office.mp4',   type: 'video',    duration: '2:15',  color: '#6D28D9', thumb: 'https://images.unsplash.com/photo-1497366216548-37526070297c?w=320&auto=format&fit=crop&q=80' },
+  { id: 'm3', name: 'Drone Shots.mp4',     type: 'video',    duration: '4:22',  color: '#5B21B6', thumb: 'https://images.unsplash.com/photo-1469474968028-56623f02e42e?w=320&auto=format&fit=crop&q=80' },
+  { id: 'm4', name: 'Product Demo.mp4',    type: 'video',    duration: '3:10',  color: '#7C3AED', thumb: 'https://images.unsplash.com/photo-1551434678-e076c223a692?w=320&auto=format&fit=crop&q=80' },
+  { id: 'm5', name: 'BG Music Lo-Fi.mp3',  type: 'audio',    duration: '3:32',  color: '#10B981' },
+  { id: 'm6', name: 'Voiceover Final.mp3', type: 'audio',    duration: '8:45',  color: '#F59E0B' },
+  { id: 'm7', name: 'SFX Whoosh.wav',      type: 'audio',    duration: '0:02',  color: '#06B6D4' },
+  { id: 'm8', name: 'Thumbnail BG.png',    type: 'image',    duration: '—',     color: '#EC4899', thumb: 'https://images.unsplash.com/photo-1611532736597-de2d4265fba3?w=320&auto=format&fit=crop&q=80' },
+  { id: 'm9', name: 'Logo Animated.mov',   type: 'video',    duration: '0:05',  color: '#0E7490', thumb: 'https://images.unsplash.com/photo-1478720568477-152d9b164e26?w=320&auto=format&fit=crop&q=80' },
+  { id: 'm10', name: 'Subtitles EN.srt',   type: 'subtitle', duration: '—',     color: '#EF4444' },
 ]
 
 export const stockMusic = [
@@ -126,9 +126,9 @@ export const fontFamilies   = ['Inter','Montserrat','Bebas Neue','Roboto','Playf
 export const subtitleLanguages = ['English','Indonesian','Spanish','French','German','Japanese','Korean','Arabic']
 
 export const stockFootage = [
-  { id: 'sf1', name: 'City Timelapse 4K',  duration: '0:30', tags: 'city urban' },
-  { id: 'sf2', name: 'Nature Forest Walk', duration: '0:45', tags: 'nature forest' },
-  { id: 'sf3', name: 'Office Workspace',   duration: '0:20', tags: 'office work' },
-  { id: 'sf4', name: 'Tech Abstract BG',   duration: '0:15', tags: 'tech abstract' },
-  { id: 'sf5', name: 'People Walking',     duration: '0:25', tags: 'people street' },
+  { id: 'sf1', name: 'City Timelapse 4K',  duration: '0:30', tags: 'city urban',    thumb: 'https://images.unsplash.com/photo-1477959858617-67f85cf4f1df?w=480&auto=format&fit=crop&q=80' },
+  { id: 'sf2', name: 'Nature Forest Walk', duration: '0:45', tags: 'nature forest', thumb: 'https://images.unsplash.com/photo-1448375240586-882707db888b?w=480&auto=format&fit=crop&q=80' },
+  { id: 'sf3', name: 'Office Workspace',   duration: '0:20', tags: 'office work',   thumb: 'https://images.unsplash.com/photo-1497366216548-37526070297c?w=480&auto=format&fit=crop&q=80' },
+  { id: 'sf4', name: 'Tech Abstract BG',   duration: '0:15', tags: 'tech abstract', thumb: 'https://images.unsplash.com/photo-1518770660439-4636190af475?w=480&auto=format&fit=crop&q=80' },
+  { id: 'sf5', name: 'People Walking',     duration: '0:25', tags: 'people street', thumb: 'https://images.unsplash.com/photo-1519121785383-3229633bb75b?w=480&auto=format&fit=crop&q=80' },
 ]

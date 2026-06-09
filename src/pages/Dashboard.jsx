@@ -22,34 +22,35 @@ const STATUS_CLS = {
   published: 'bg-emerald-900/60 text-emerald-400',
 }
 
+// Creator/vlog-themed Unsplash photos
+const PROJECT_IMGS = [
+  'https://images.unsplash.com/photo-1611532736597-de2d4265fba3?w=640&auto=format&fit=crop&q=80',
+  'https://images.unsplash.com/photo-1492691527719-9d1e07e534b4?w=640&auto=format&fit=crop&q=80',
+  'https://images.unsplash.com/photo-1598488035139-bdbb2231ce04?w=640&auto=format&fit=crop&q=80',
+  'https://images.unsplash.com/photo-1574717024653-61fd2cf4d44d?w=640&auto=format&fit=crop&q=80',
+  'https://images.unsplash.com/photo-1553877522-43269d4ea984?w=640&auto=format&fit=crop&q=80',
+  'https://images.unsplash.com/photo-1526779259212-939e64788e3c?w=640&auto=format&fit=crop&q=80',
+]
+
 // ── Animated canvas thumbnail for project cards ─────────────────────────────
 function ProjectThumb({ color, title }) {
   const canvasRef = useRef(null)
   const animRef   = useRef(null)
+  const seed      = [...title].reduce((a, c) => a + c.charCodeAt(0), 0)
+  const imgUrl    = PROJECT_IMGS[seed % PROJECT_IMGS.length]
 
   useEffect(() => {
     const canvas = canvasRef.current
     if (!canvas) return
     const ctx = canvas.getContext('2d')
     let t = 0
-    const seed = [...title].reduce((a, c) => a + c.charCodeAt(0), 0)
 
     const render = () => {
       t += 0.018
       const { width: w, height: h } = canvas
+      ctx.clearRect(0, 0, w, h)
 
-      // Animated gradient background
-      const grad = ctx.createLinearGradient(
-        w * 0.5 + Math.sin(t * 0.4) * w * 0.3, 0,
-        w * 0.5 - Math.cos(t * 0.3) * w * 0.3, h
-      )
-      grad.addColorStop(0, color + '50')
-      grad.addColorStop(0.6, '#080808')
-      grad.addColorStop(1,   color + '15')
-      ctx.fillStyle = grad
-      ctx.fillRect(0, 0, w, h)
-
-      // Floating particles
+      // floating particles
       for (let i = 0; i < 6; i++) {
         const px = ((seed * (i + 1) * 137.5) % w)
         const py = ((seed * (i + 1) * 97.3)  % h)
@@ -60,73 +61,19 @@ function ProjectThumb({ color, title }) {
           py + Math.cos(t * 0.4 + i * 1.2) * 7,
           r, 0, Math.PI * 2
         )
-        ctx.fillStyle = `rgba(255,255,255,${0.08 + Math.sin(t + i) * 0.04})`
+        ctx.fillStyle = `rgba(255,255,255,${0.15 + Math.sin(t + i) * 0.06})`
         ctx.fill()
       }
 
-      // Light horizontal scan line
+      // scan line
       const scanY = ((t * 25) % (h + 2)) - 1
-      ctx.fillStyle = 'rgba(255,255,255,0.012)'
+      ctx.fillStyle = 'rgba(255,255,255,0.018)'
       ctx.fillRect(0, scanY, w, 2)
 
-      // Corner viewfinder brackets in the project color
+      // corner viewfinder brackets
       const bl = 10
-      ctx.strokeStyle = color + '99'
+      ctx.strokeStyle = color + 'cc'
       ctx.lineWidth = 1.5
-      ;[[0, 0],[w, 0],[0, h],[w, h]].forEach(([x, y]) => {
-        const dx = x === 0 ? bl : -bl
-        const dy = y === 0 ? bl : -bl
-        ctx.beginPath(); ctx.moveTo(x + dx, y); ctx.lineTo(x, y); ctx.lineTo(x, y + dy); ctx.stroke()
-      })
-
-      animRef.current = requestAnimationFrame(render)
-    }
-
-    render()
-    return () => { if (animRef.current) cancelAnimationFrame(animRef.current) }
-  }, [color, title])
-
-  return <canvas ref={canvasRef} width={320} height={180} className="w-full h-full block" />
-}
-
-// ── Animated canvas thumbnail for stock footage items ───────────────────────
-function FootageThumb({ color, idx }) {
-  const canvasRef = useRef(null)
-  const animRef   = useRef(null)
-
-  useEffect(() => {
-    const canvas = canvasRef.current
-    if (!canvas) return
-    const ctx = canvas.getContext('2d')
-    let t = idx * 1.3  // offset so each card looks different
-
-    const render = () => {
-      t += 0.025
-      const { width: w, height: h } = canvas
-      const grad = ctx.createLinearGradient(Math.sin(t*0.5)*w, 0, w - Math.cos(t*0.3)*w*0.5, h)
-      grad.addColorStop(0, color + '60')
-      grad.addColorStop(1, '#050505')
-      ctx.fillStyle = grad
-      ctx.fillRect(0, 0, w, h)
-
-      // Simulated moving subject
-      ctx.save()
-      ctx.globalAlpha = 0.18
-      ctx.fillStyle = '#ccc'
-      const bob = Math.sin(t * 0.6) * 2
-      ctx.beginPath(); ctx.ellipse(w*0.5, h*0.35 + bob, w*0.08, h*0.15, 0, 0, Math.PI*2); ctx.fill()
-      ctx.fillRect(w*0.43, h*0.5 + bob, w*0.14, h*0.28)
-      ctx.restore()
-
-      // scan
-      const sy = ((t * 50) % (h + 2)) - 1
-      ctx.fillStyle = 'rgba(255,255,255,0.02)'
-      ctx.fillRect(0, sy, w, 1.5)
-
-      // corner brackets
-      const bl = 5
-      ctx.strokeStyle = color + 'aa'
-      ctx.lineWidth = 1
       ;[[0,0],[w,0],[0,h],[w,h]].forEach(([x,y]) => {
         const dx = x===0?bl:-bl, dy = y===0?bl:-bl
         ctx.beginPath(); ctx.moveTo(x+dx,y); ctx.lineTo(x,y); ctx.lineTo(x,y+dy); ctx.stroke()
@@ -134,11 +81,59 @@ function FootageThumb({ color, idx }) {
 
       animRef.current = requestAnimationFrame(render)
     }
+
     render()
     return () => { if (animRef.current) cancelAnimationFrame(animRef.current) }
-  }, [color, idx])
+  }, [color, title, seed])
 
-  return <canvas ref={canvasRef} width={180} height={100} className="w-full h-full block" />
+  return (
+    <div className="w-full h-full relative overflow-hidden bg-black">
+      <img
+        src={imgUrl}
+        alt=""
+        className="absolute inset-0 w-full h-full object-cover"
+        style={{ filter: 'brightness(0.65) saturate(1.15)' }}
+        loading="lazy"
+      />
+      <div
+        className="absolute inset-0"
+        style={{ background: `linear-gradient(135deg, ${color}40 0%, transparent 55%, ${color}20 100%)` }}
+      />
+      <canvas
+        ref={canvasRef}
+        width={320}
+        height={180}
+        className="absolute inset-0 w-full h-full block"
+      />
+    </div>
+  )
+}
+
+// Stock footage preview images (Unsplash)
+const FOOTAGE_IMGS = [
+  'https://images.unsplash.com/photo-1477959858617-67f85cf4f1df?w=480&auto=format&fit=crop&q=80',
+  'https://images.unsplash.com/photo-1448375240586-882707db888b?w=480&auto=format&fit=crop&q=80',
+  'https://images.unsplash.com/photo-1497366216548-37526070297c?w=480&auto=format&fit=crop&q=80',
+  'https://images.unsplash.com/photo-1518770660439-4636190af475?w=480&auto=format&fit=crop&q=80',
+  'https://images.unsplash.com/photo-1519121785383-3229633bb75b?w=480&auto=format&fit=crop&q=80',
+]
+
+// ── Animated canvas thumbnail for stock footage items ───────────────────────
+function FootageThumb({ idx }) {
+  return (
+    <div className="w-full h-full relative overflow-hidden bg-zinc-900">
+      <img
+        src={FOOTAGE_IMGS[idx % FOOTAGE_IMGS.length]}
+        alt=""
+        className="w-full h-full object-cover"
+        style={{ filter: 'brightness(0.75) saturate(1.2)' }}
+        loading="lazy"
+      />
+      {/* Letterbox bars for cinematic feel */}
+      <div className="absolute inset-x-0 top-0 h-[9%] bg-black" />
+      <div className="absolute inset-x-0 bottom-0 h-[9%] bg-black" />
+    </div>
+  )
 }
 
 // ── Web Audio music preview ──────────────────────────────────────────────────
@@ -522,7 +517,7 @@ export default function Dashboard() {
                         className="rounded-2xl overflow-hidden border border-[#1A1A1A] hover:border-[#2A2A2A] transition-all group bg-[#0D0D0D]">
                         {/* Animated thumbnail */}
                         <div className="aspect-video relative overflow-hidden">
-                          <FootageThumb color={color} idx={idx} />
+                          <FootageThumb idx={idx} />
                           <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
                             <button
                               onClick={() => toast.add(`Preview: ${f.name}`, 'info')}

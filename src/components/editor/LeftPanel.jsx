@@ -513,7 +513,12 @@ export default function LeftPanel({
                     draggable
                     onDragStart={e => e.dataTransfer.setData('application/peakedit-media', JSON.stringify({ id: f.id, name: f.name, type: 'video', duration: f.duration, color: '#7C3AED' }))}
                     className="flex items-center gap-2 px-2 py-1.5 rounded-lg bg-[#141414] border border-[#1F1F1F] hover:border-[#2A2A2A] cursor-grab transition-all">
-                    <div className="w-6 h-6 rounded-md bg-violet-900/40 flex items-center justify-center shrink-0"><Film size={10} className="text-violet-400" /></div>
+                    <div className="w-10 h-7 rounded-md overflow-hidden shrink-0 bg-zinc-800">
+                      {f.thumb
+                        ? <img src={f.thumb} alt="" className="w-full h-full object-cover" style={{ filter:'brightness(0.75)' }} loading="lazy" />
+                        : <div className="w-full h-full flex items-center justify-center"><Film size={10} className="text-violet-400" /></div>
+                      }
+                    </div>
                     <div className="flex-1 min-w-0">
                       <p className="text-[11px] text-zinc-300 truncate">{f.name}</p>
                       <p className="text-[9px] text-zinc-600">{f.duration} · {f.tags}</p>

@@ -3,10 +3,21 @@ import { Play, Pause, SkipBack, SkipForward, Volume2 } from 'lucide-react'
 import { fmtTime } from '../../utils/helpers'
 import { getBlobUrl } from '../../utils/fileRegistry'
 
-// Animated canvas demo — plays when no real video file is uploaded
+// Real scene photos — load in user's browser from Unsplash CDN
+const SCENE_BG = {
+  'Intro Hook':     'https://images.unsplash.com/photo-1611532736597-de2d4265fba3?w=800&auto=format&fit=crop&q=80',
+  'Main Content A': 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=800&auto=format&fit=crop&q=80',
+  'B-Roll Insert':  'https://images.unsplash.com/photo-1469474968028-56623f02e42e?w=800&auto=format&fit=crop&q=80',
+  'Main Content B': 'https://images.unsplash.com/photo-1551434678-e076c223a692?w=800&auto=format&fit=crop&q=80',
+  'Outro':          'https://images.unsplash.com/photo-1478720568477-152d9b164e26?w=800&auto=format&fit=crop&q=80',
+}
+const SCENE_DEFAULT = 'https://images.unsplash.com/photo-1492691527719-9d1e07e534b4?w=800&auto=format&fit=crop&q=80'
+
 function DemoCanvas({ clip, style }) {
   const canvasRef = useRef(null)
   const animRef   = useRef(null)
+  const isAudio   = clip?.type === 'audio'
+  const bgImg     = !isAudio ? (SCENE_BG[clip?.label] ?? SCENE_DEFAULT) : null
 
   useEffect(() => {
     const canvas = canvasRef.current
@@ -14,33 +25,16 @@ function DemoCanvas({ clip, style }) {
     const ctx = canvas.getContext('2d')
     let t = 0
 
-    const SCENE_COLORS = {
-      'Intro Hook':     ['#2D1B69', '#4C1D95'],
-      'Main Content A': ['#1E3A8A', '#1D4ED8'],
-      'B-Roll Insert':  ['#064E3B', '#065F46'],
-      'Main Content B': ['#312E81', '#4338CA'],
-      'Outro':          ['#1A1A2E', '#16213E'],
-    }
-    const [c1, c2] = SCENE_COLORS[clip?.label] || ['#1a0533', '#001a33']
-    const isAudio = clip?.type === 'audio'
-
     const render = () => {
       t += 0.016
       const { width: w, height: h } = canvas
-
-      // Animated radial gradient background
-      const grad = ctx.createRadialGradient(
-        w * 0.5 + Math.sin(t * 0.3) * w * 0.12,
-        h * 0.5 + Math.cos(t * 0.2) * h * 0.08,
-        0, w * 0.5, h * 0.5, Math.max(w, h) * 0.75
-      )
-      grad.addColorStop(0, c1)
-      grad.addColorStop(1, '#050505')
-      ctx.fillStyle = grad
-      ctx.fillRect(0, 0, w, h)
+      ctx.clearRect(0, 0, w, h)
 
       if (isAudio) {
-        // Waveform visualiser
+        ctx.fillStyle = '#030303'
+        ctx.fillRect(0, 0, w, h)
+
+        // waveform line
         ctx.strokeStyle = '#10B981'
         ctx.lineWidth = 1.5
         ctx.beginPath()
@@ -50,60 +44,48 @@ function DemoCanvas({ clip, style }) {
         }
         ctx.stroke()
 
-        // Frequency bars
-        const bars = 28
-        const bw = w / bars
+        // frequency bars
+        const bars = 28, bw = w / bars
         for (let i = 0; i < bars; i++) {
           const bh = (Math.sin(i * 0.6 + t * 5) * 0.5 + 0.52) * h * 0.38
           ctx.fillStyle = `rgba(16,185,129,${0.3 + Math.sin(i * 0.4 + t * 2) * 0.25})`
           ctx.fillRect(i * bw + 1, h * 0.88 - bh, bw - 2, bh)
         }
       } else {
-        // Rule-of-thirds grid (faint)
-        ctx.strokeStyle = 'rgba(255,255,255,0.04)'
-        ctx.lineWidth = 1
-        for (let i = 1; i < 3; i++) {
-          ctx.beginPath(); ctx.moveTo(w * i / 3, 0); ctx.lineTo(w * i / 3, h); ctx.stroke()
-          ctx.beginPath(); ctx.moveTo(0, h * i / 3); ctx.lineTo(w, h * i / 3); ctx.stroke()
-        }
+        // cinematic vignette over real photo
+        const vig = ctx.createRadialGradient(w*0.5, h*0.5, 0, w*0.5, h*0.5, Math.max(w,h)*0.72)
+        vig.addColorStop(0.25, 'rgba(0,0,0,0)')
+        vig.addColorStop(1,   'rgba(0,0,0,0.62)')
+        ctx.fillStyle = vig
+        ctx.fillRect(0, 0, w, h)
 
-        // Simulated subject (person silhouette)
-        const bob = Math.sin(t * 0.7) * 2
-        ctx.save()
-        ctx.globalAlpha = 0.22 + Math.sin(t * 0.4) * 0.02
-        // head
-        ctx.fillStyle = '#d4b896'
-        ctx.beginPath(); ctx.ellipse(w * 0.5, h * 0.34 + bob, w * 0.055, h * 0.09, 0, 0, Math.PI * 2); ctx.fill()
-        // body
-        ctx.fillStyle = '#555'
-        ctx.beginPath()
-        ctx.moveTo(w * 0.42, h * 0.45 + bob)
-        ctx.lineTo(w * 0.58, h * 0.45 + bob)
-        ctx.lineTo(w * 0.55, h * 0.72 + bob)
-        ctx.lineTo(w * 0.45, h * 0.72 + bob)
-        ctx.closePath(); ctx.fill()
-        ctx.restore()
-
-        // Film grain
-        for (let i = 0; i < 50; i++) {
-          ctx.fillStyle = `rgba(255,255,255,${Math.random() * 0.03})`
+        // film grain
+        for (let i = 0; i < 40; i++) {
+          ctx.fillStyle = `rgba(255,255,255,${Math.random() * 0.022})`
           ctx.fillRect(Math.random() * w, Math.random() * h, 1, 1)
         }
 
-        // Scan line
+        // subtle scan line
         const scanY = ((t * 55) % (h + 4)) - 2
-        ctx.fillStyle = 'rgba(255,255,255,0.018)'
+        ctx.fillStyle = 'rgba(255,255,255,0.014)'
         ctx.fillRect(0, scanY, w, 2)
+
+        // rule-of-thirds
+        ctx.strokeStyle = 'rgba(255,255,255,0.05)'
+        ctx.lineWidth = 0.5
+        for (let i = 1; i < 3; i++) {
+          ctx.beginPath(); ctx.moveTo(w*i/3, 0); ctx.lineTo(w*i/3, h); ctx.stroke()
+          ctx.beginPath(); ctx.moveTo(0, h*i/3); ctx.lineTo(w, h*i/3); ctx.stroke()
+        }
       }
 
-      // Corner viewfinder brackets
+      // corner viewfinder brackets
       const bl = Math.min(w, h) * 0.09
-      ctx.strokeStyle = 'rgba(255,255,255,0.35)'
+      ctx.strokeStyle = 'rgba(255,255,255,0.45)'
       ctx.lineWidth = 1.5
-      ;[[0, 0], [w, 0], [0, h], [w, h]].forEach(([x, y]) => {
-        const dx = x === 0 ? bl : -bl
-        const dy = y === 0 ? bl : -bl
-        ctx.beginPath(); ctx.moveTo(x + dx, y); ctx.lineTo(x, y); ctx.lineTo(x, y + dy); ctx.stroke()
+      ;[[0,0],[w,0],[0,h],[w,h]].forEach(([x,y]) => {
+        const dx = x===0?bl:-bl, dy = y===0?bl:-bl
+        ctx.beginPath(); ctx.moveTo(x+dx,y); ctx.lineTo(x,y); ctx.lineTo(x,y+dy); ctx.stroke()
       })
 
       animRef.current = requestAnimationFrame(render)
@@ -111,9 +93,27 @@ function DemoCanvas({ clip, style }) {
 
     render()
     return () => { if (animRef.current) cancelAnimationFrame(animRef.current) }
-  }, [clip?.label, clip?.type])
+  }, [clip?.label, clip?.type, isAudio])
 
-  return <canvas ref={canvasRef} width={480} height={270} className="w-full h-full" style={style} />
+  return (
+    <div className="w-full h-full relative overflow-hidden bg-black" style={style}>
+      {bgImg && (
+        <img
+          src={bgImg}
+          alt=""
+          className="absolute inset-0 w-full h-full object-cover"
+          style={{ filter: 'brightness(0.72) saturate(1.1)' }}
+          loading="eager"
+        />
+      )}
+      <canvas
+        ref={canvasRef}
+        width={480}
+        height={270}
+        className="absolute inset-0 w-full h-full"
+      />
+    </div>
+  )
 }
 
 // Format → canvas container dimensions

@@ -52,13 +52,14 @@ function WaveformCanvas({ mediaId, color, width, height }) {
 }
 
 // ── Thumbnail strip ──────────────────────────────────────────────────────────
-function ThumbnailStrip({ mediaId }) {
+function ThumbnailStrip({ mediaId, thumbUrl }) {
   const entry = getEntry(mediaId)
-  if (!entry?.thumbnail) return null
+  const src   = entry?.thumbnail || thumbUrl || null
+  if (!src) return null
   return (
     <img
-      src={entry.thumbnail}
-      className="absolute inset-0 w-full h-full object-cover opacity-25 pointer-events-none"
+      src={src}
+      className="absolute inset-0 w-full h-full object-cover opacity-30 pointer-events-none"
       alt=""
     />
   )
@@ -69,6 +70,7 @@ export default function Timeline({
   tracks, currentTime, setCurrentTime, totalDuration,
   selectedClip, onSelectClip, zoom, setZoom,
   onTracksChange, onAddClip, onDeleteClip, onSplitClip,
+  mediaFiles,
 }) {
   const pps      = PX_PER_SEC * zoom
   const scrollRef = useRef(null)
@@ -279,7 +281,10 @@ export default function Timeline({
 
                       {/* Real thumbnail for video tracks */}
                       {track.type === 'video' && clip.mediaId && (
-                        <ThumbnailStrip mediaId={clip.mediaId} />
+                        <ThumbnailStrip
+                          mediaId={clip.mediaId}
+                          thumbUrl={mediaFiles?.find(m => m.id === clip.mediaId)?.thumb}
+                        />
                       )}
 
                       {/* Fallback simulated waveform (no real file) */}
