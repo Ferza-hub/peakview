@@ -1,163 +1,134 @@
-export const projects = [
-  { id: 1, title: 'How I Made $100K as a Creator', duration: '1:24', platform: 'youtube',   color: '#7C3AED', lastEdited: '2 hours ago',   status: 'draft',     collaborators: 2, progress: 75 },
-  { id: 2, title: 'Morning Routine Reel 2026',      duration: '0:45', platform: 'instagram', color: '#EC4899', lastEdited: 'Yesterday',      status: 'published', collaborators: 1, progress: 100 },
-  { id: 3, title: 'Top 10 AI Tools Review',         duration: '2:10', platform: 'youtube',   color: '#2563EB', lastEdited: '3 days ago',    status: 'draft',     collaborators: 3, progress: 40 },
-  { id: 4, title: 'Studio Setup Tour 2026',         duration: '0:58', platform: 'tiktok',   color: '#06B6D4', lastEdited: '1 week ago',    status: 'draft',     collaborators: 1, progress: 60 },
-  { id: 5, title: 'Creator Burnout Honest Talk',    duration: '1:50', platform: 'youtube',   color: '#DC2626', lastEdited: '2 weeks ago',   status: 'draft',     collaborators: 0, progress: 20 },
-  { id: 6, title: 'Brand Deal Tips for Beginners',  duration: '1:15', platform: 'youtube',   color: '#D97706', lastEdited: '3 weeks ago',   status: 'published', collaborators: 2, progress: 100 },
-]
-
 export const TOTAL_DURATION = 65
 
 export const initialTracks = [
   {
-    id: 'v1', type: 'video', label: 'V1', height: 40, muted: false, locked: false,
+    id: 'v1', label: 'V1 Main', type: 'video', muted: false, locked: false, height: 44,
     clips: [
-      { id: 'c1',  label: 'Intro.mp4',          start: 0,  duration: 8,  color: '#2563EB', type: 'video' },
-      { id: 'c2',  label: 'Main_Interview.mp4',  start: 8,  duration: 27, color: '#7C3AED', type: 'video' },
-      { id: 'c3',  label: 'Office_BRoll.mp4',    start: 35, duration: 10, color: '#0891B2', type: 'video' },
-      { id: 'c4',  label: 'Interview_2.mp4',     start: 45, duration: 12, color: '#7C3AED', type: 'video' },
-      { id: 'c5',  label: 'Outro.mp4',           start: 57, duration: 8,  color: '#059669', type: 'video' },
-    ],
+      { id: 'c1', label: 'Intro Hook', start: 0, duration: 8, color: '#7C3AED', type: 'video' },
+      { id: 'c2', label: 'Main Content A', start: 9, duration: 18, color: '#6D28D9', type: 'video' },
+      { id: 'c3', label: 'B-Roll Insert', start: 28, duration: 10, color: '#5B21B6', type: 'video' },
+      { id: 'c4', label: 'Main Content B', start: 39, duration: 15, color: '#7C3AED', type: 'video' },
+      { id: 'c5', label: 'Outro', start: 55, duration: 10, color: '#4C1D95', type: 'video' },
+    ]
   },
   {
-    id: 'v2', type: 'video', label: 'V2', height: 36, muted: false, locked: false,
+    id: 'v2', label: 'V2 Overlay', type: 'video', muted: false, locked: false, height: 32,
     clips: [
-      { id: 'c6',  label: 'Logo_Overlay.mov',            start: 0,  duration: 5, color: '#D97706', type: 'overlay' },
-      { id: 'c7',  label: 'Lower Third — Alex Rivera',   start: 9,  duration: 6, color: '#BE185D', type: 'overlay' },
-      { id: 'c8',  label: 'Lower Third — @alexrivera',   start: 47, duration: 5, color: '#BE185D', type: 'overlay' },
-    ],
+      { id: 'c6', label: 'Logo Bug', start: 2, duration: 60, color: '#0E7490', type: 'video' },
+      { id: 'c7', label: 'Lower Third', start: 10, duration: 5, color: '#06B6D4', type: 'video' },
+    ]
   },
   {
-    id: 'a1', type: 'audio', label: 'Music', height: 32, muted: false, locked: false,
+    id: 'a1', label: 'Music', type: 'audio', muted: false, locked: false, height: 36,
     clips: [
-      { id: 'c9',  label: 'Chill_Vibes_LoFi.mp3', start: 0, duration: 65, color: '#16A34A', type: 'audio' },
-    ],
+      { id: 'c8', label: 'Intro Beat', start: 0, duration: 12, color: '#10B981', type: 'audio' },
+      { id: 'c9', label: 'Main Track', start: 12, duration: 48, color: '#059669', type: 'audio' },
+    ]
   },
   {
-    id: 'a2', type: 'audio', label: 'VO', height: 32, muted: false, locked: false,
+    id: 'a2', label: 'VO', type: 'audio', muted: false, locked: false, height: 32,
     clips: [
-      { id: 'c10', label: 'VO_Intro.wav', start: 2,  duration: 5,  color: '#0284C7', type: 'audio' },
-      { id: 'c11', label: 'VO_Main.wav',  start: 10, duration: 23, color: '#0284C7', type: 'audio' },
-      { id: 'c12', label: 'VO_Outro.wav', start: 58, duration: 5,  color: '#0284C7', type: 'audio' },
-    ],
+      { id: 'c10', label: 'Voiceover 1', start: 1, duration: 20, color: '#F59E0B', type: 'audio' },
+      { id: 'c11', label: 'Voiceover 2', start: 28, duration: 25, color: '#D97706', type: 'audio' },
+    ]
   },
   {
-    id: 'sub', type: 'subtitle', label: 'Sub', height: 28, muted: false, locked: false,
+    id: 'sub', label: 'Subtitles', type: 'subtitle', muted: false, locked: false, height: 26,
     clips: [
-      { id: 'c13', label: 'Hey, welcome back to the channel!',     start: 2,  duration: 2.8, color: '#F59E0B', type: 'subtitle' },
-      { id: 'c14', label: "I'm Alex and today we're talking...",   start: 5,  duration: 3.2, color: '#F59E0B', type: 'subtitle' },
-      { id: 'c15', label: 'So last year I decided to go all-in',   start: 10, duration: 3.5, color: '#F59E0B', type: 'subtitle' },
-      { id: 'c16', label: 'And the results were incredible',       start: 14, duration: 3.0, color: '#F59E0B', type: 'subtitle' },
-      { id: 'c17', label: "Here's exactly what I did...",          start: 18, duration: 2.5, color: '#F59E0B', type: 'subtitle' },
-      { id: 'c18', label: 'First, consistency above everything',   start: 22, duration: 3.5, color: '#F59E0B', type: 'subtitle' },
-      { id: 'c19', label: 'I posted 3 times a week minimum',      start: 26, duration: 3.5, color: '#F59E0B', type: 'subtitle' },
-      { id: 'c20', label: 'The algorithm rewards consistency',     start: 30, duration: 3.2, color: '#F59E0B', type: 'subtitle' },
-      { id: 'c21', label: 'Second lesson: know your numbers',     start: 35, duration: 3.0, color: '#F59E0B', type: 'subtitle' },
-      { id: 'c22', label: 'Track every metric obsessively',       start: 39, duration: 3.0, color: '#F59E0B', type: 'subtitle' },
-    ],
+      { id: 'c12', label: "Hey what's up everyone", start: 1, duration: 4, color: '#EF4444', type: 'subtitle', text: "Hey what's up everyone" },
+      { id: 'c13', label: 'Today I want to show you', start: 5.5, duration: 3.5, color: '#EF4444', type: 'subtitle', text: 'Today I want to show you' },
+    ]
   },
   {
-    id: 'fx', type: 'fx', label: 'FX', height: 28, muted: false, locked: false,
+    id: 'fx', label: 'FX', type: 'fx', muted: false, locked: false, height: 22,
     clips: [
-      { id: 'c23', label: 'Cinematic Color Grade', start: 0,  duration: 65, color: '#7C3AED', type: 'fx' },
-      { id: 'c24', label: 'Film Grain',            start: 0,  duration: 65, color: '#525252', type: 'fx' },
-      { id: 'c25', label: 'Cross Dissolve',        start: 7.5, duration: 1, color: '#DC2626', type: 'transition' },
-    ],
+      { id: 'c14', label: 'Zoom In', start: 0, duration: 2, color: '#8B5CF6', type: 'fx' },
+      { id: 'c15', label: 'Flash', start: 27, duration: 1, color: '#EC4899', type: 'fx' },
+    ]
   },
-]
-
-export const stockMusic = [
-  { id: 1, title: 'Chill Vibes Lo-Fi',      artist: 'Studio Beats',  duration: '3:24', genre: 'Lo-Fi',     bpm: 85,  color: '#16A34A' },
-  { id: 2, title: 'Epic Cinematic Rise',    artist: 'Epic Music Co.',duration: '2:45', genre: 'Epic',      bpm: 120, color: '#DC2626' },
-  { id: 3, title: 'Upbeat Corporate',       artist: 'Business Beats',duration: '2:10', genre: 'Corporate', bpm: 130, color: '#2563EB' },
-  { id: 4, title: 'Dreamy Ambient',         artist: 'Ambient Lab',   duration: '4:00', genre: 'Ambient',   bpm: 70,  color: '#7C3AED' },
-  { id: 5, title: 'Funky Groove',           artist: 'Funk Factory',  duration: '2:55', genre: 'Funk',      bpm: 105, color: '#D97706' },
-  { id: 6, title: 'Energetic Pop',          artist: 'Pop Studio',    duration: '3:12', genre: 'Pop',       bpm: 128, color: '#EC4899' },
-  { id: 7, title: 'Soft Piano Ballad',      artist: 'Piano House',   duration: '3:40', genre: 'Piano',     bpm: 75,  color: '#0891B2' },
-  { id: 8, title: 'Hip Hop Trap Beat',      artist: 'Urban Sounds',  duration: '2:30', genre: 'Hip-Hop',   bpm: 140, color: '#374151' },
-  { id: 9, title: 'Morning Coffee Jazz',    artist: 'Jazz Corner',   duration: '4:15', genre: 'Jazz',      bpm: 90,  color: '#92400E' },
-  { id: 10, title: 'Summer Electronic',    artist: 'EDM Lab',       duration: '3:00', genre: 'Electronic',bpm: 135, color: '#0284C7' },
-]
-
-export const stockFootage = [
-  { id: 1,  title: 'City Time-Lapse 4K',    category: 'Urban',    duration: '0:30', color: '#1D4ED8' },
-  { id: 2,  title: 'Nature Aerial Shot',     category: 'Nature',   duration: '0:20', color: '#059669' },
-  { id: 3,  title: 'Business Team Meeting',  category: 'Business', duration: '0:45', color: '#7C3AED' },
-  { id: 4,  title: 'Laptop + Coffee Desk',   category: 'Lifestyle',duration: '0:15', color: '#D97706' },
-  { id: 5,  title: 'Ocean Sunset Drone',     category: 'Nature',   duration: '0:25', color: '#0891B2' },
-  { id: 6,  title: 'Tech Background Loop',   category: 'Tech',     duration: '0:10', color: '#4F46E5' },
-  { id: 7,  title: 'Studio Recording Session',category: 'Creative',duration: '0:35', color: '#BE185D' },
-  { id: 8,  title: 'Walking City Streets',   category: 'Urban',    duration: '0:20', color: '#374151' },
-]
-
-export const transitions = [
-  { id: 1, name: 'Cross Dissolve',  icon: '⟶', preview: '#7C3AED' },
-  { id: 2, name: 'Fade to Black',   icon: '◼',  preview: '#111' },
-  { id: 3, name: 'Slide Left',      icon: '←',  preview: '#2563EB' },
-  { id: 4, name: 'Slide Right',     icon: '→',  preview: '#059669' },
-  { id: 5, name: 'Zoom In',         icon: '⊕',  preview: '#DC2626' },
-  { id: 6, name: 'Zoom Out',        icon: '⊖',  preview: '#D97706' },
-  { id: 7, name: 'Glitch',          icon: '⚡',  preview: '#06B6D4' },
-  { id: 8, name: 'Spin',            icon: '↺',  preview: '#EC4899' },
-  { id: 9, name: 'Wipe',            icon: '▷',  preview: '#16A34A' },
-]
-
-export const colorPresets = [
-  { id: 1, name: 'Cinematic',    preview: ['#1A0A00','#F5DEB3'], warm: 15,  contrast: 20, sat: -10 },
-  { id: 2, name: 'Cool Tone',    preview: ['#001828','#B0D4E8'], warm: -20, contrast: 15, sat: 5  },
-  { id: 3, name: 'Vibrant',      preview: ['#0D0024','#FFD700'], warm: 5,   contrast: 10, sat: 40 },
-  { id: 4, name: 'Black & White',preview: ['#000','#FFF'],       warm: 0,   contrast: 30, sat: -100},
-  { id: 5, name: 'Sunset',       preview: ['#8B0000','#FFD59E'], warm: 40,  contrast: 15, sat: 20 },
-  { id: 6, name: 'Moody',        preview: ['#0A0A18','#6464A0'], warm: -10, contrast: 40, sat: -20},
-]
-
-export const templates = [
-  { id: 1,  name: 'YouTube Intro Minimal',    category: 'intro',       duration: '0:05', color: '#FF0000', platform: 'youtube'   },
-  { id: 2,  name: 'YouTube Outro Subscribe',  category: 'outro',       duration: '0:20', color: '#FF0000', platform: 'youtube'   },
-  { id: 3,  name: 'Lower Third Minimal',      category: 'lower-third', duration: '0:05', color: '#7C3AED', platform: 'all'       },
-  { id: 4,  name: 'Lower Third Bold',         category: 'lower-third', duration: '0:05', color: '#2563EB', platform: 'all'       },
-  { id: 5,  name: 'TikTok Trending Hook',     category: 'intro',       duration: '0:03', color: '#06B6D4', platform: 'tiktok'    },
-  { id: 6,  name: 'Reels Opening Title',      category: 'intro',       duration: '0:04', color: '#EC4899', platform: 'instagram' },
-  { id: 7,  name: 'Tutorial Chapter Card',    category: 'chapter',     duration: '0:05', color: '#D97706', platform: 'youtube'   },
-  { id: 8,  name: 'Review Score Overlay',     category: 'overlay',     duration: '0:06', color: '#16A34A', platform: 'all'       },
-  { id: 9,  name: 'Subscribe Button Anim',    category: 'cta',         duration: '0:04', color: '#FF0000', platform: 'youtube'   },
-  { id: 10, name: 'Social Media Bug',         category: 'overlay',     duration: 'loop', color: '#BE185D', platform: 'all'       },
-  { id: 11, name: 'Travel Vlog Full Pack',    category: 'full',        duration: '3:00', color: '#0891B2', platform: 'youtube'   },
-  { id: 12, name: 'Podcast Episode Template', category: 'full',        duration: '1:00', color: '#374151', platform: 'youtube'   },
 ]
 
 export const mediaFiles = [
-  { id: 1, name: 'Intro.mp4',           type: 'video', duration: '0:08', size: '120 MB', color: '#2563EB' },
-  { id: 2, name: 'Main_Interview.mp4',  type: 'video', duration: '0:27', size: '380 MB', color: '#7C3AED' },
-  { id: 3, name: 'Office_BRoll.mp4',    type: 'video', duration: '0:10', size: '145 MB', color: '#0891B2' },
-  { id: 4, name: 'Interview_2.mp4',     type: 'video', duration: '0:12', size: '168 MB', color: '#7C3AED' },
-  { id: 5, name: 'Outro.mp4',           type: 'video', duration: '0:08', size: '98 MB',  color: '#059669' },
-  { id: 6, name: 'Logo_Overlay.mov',    type: 'video', duration: '0:05', size: '45 MB',  color: '#D97706' },
-  { id: 7, name: 'Chill_Vibes.mp3',     type: 'audio', duration: '3:24', size: '8.2 MB', color: '#16A34A' },
-  { id: 8, name: 'VO_Main.wav',         type: 'audio', duration: '0:23', size: '4.1 MB', color: '#0284C7' },
-  { id: 9, name: 'VO_Intro.wav',        type: 'audio', duration: '0:05', size: '0.9 MB', color: '#0284C7' },
-  { id: 10, name: 'Thumbnail_Draft.png',type: 'image', duration: null,   size: '1.2 MB', color: '#EC4899' },
+  { id: 'm1', name: 'Main Interview.mp4', type: 'video', duration: '12:34', color: '#7C3AED' },
+  { id: 'm2', name: 'B-Roll Office.mp4',  type: 'video', duration: '2:15',  color: '#6D28D9' },
+  { id: 'm3', name: 'Drone Shots.mp4',    type: 'video', duration: '4:22',  color: '#5B21B6' },
+  { id: 'm4', name: 'Product Demo.mp4',   type: 'video', duration: '3:10',  color: '#7C3AED' },
+  { id: 'm5', name: 'BG Music Lo-Fi.mp3', type: 'audio', duration: '3:32',  color: '#10B981' },
+  { id: 'm6', name: 'Voiceover Final.mp3',type: 'audio', duration: '8:45',  color: '#F59E0B' },
+  { id: 'm7', name: 'SFX Whoosh.wav',     type: 'audio', duration: '0:02',  color: '#06B6D4' },
+  { id: 'm8', name: 'Thumbnail BG.png',   type: 'image', duration: '—',     color: '#EC4899' },
+  { id: 'm9', name: 'Logo Animated.mov',  type: 'video', duration: '0:05',  color: '#0E7490' },
+  { id: 'm10', name: 'Subtitles EN.srt',  type: 'subtitle', duration: '—',  color: '#EF4444' },
+]
+
+export const stockMusic = [
+  { id: 's1', title: 'Chill Lo-Fi Beats',   artist: 'AudioZen',    duration: '3:24', genre: 'Lo-Fi',     bpm: 85 },
+  { id: 's2', title: 'Epic Trailer Rise',    artist: 'CineSound',   duration: '2:45', genre: 'Epic',      bpm: 140 },
+  { id: 's3', title: 'Corporate Inspire',    artist: 'BizAudio',    duration: '3:10', genre: 'Corporate', bpm: 120 },
+  { id: 's4', title: 'Summer Vibes Pop',     artist: 'SunTracks',   duration: '3:44', genre: 'Pop',       bpm: 128 },
+  { id: 's5', title: 'Ambient Minimal',      artist: 'SpaceAudio',  duration: '4:00', genre: 'Ambient',   bpm: 70 },
+  { id: 's6', title: 'Hip-Hop Groove',       artist: 'BeatMaker',   duration: '2:58', genre: 'Hip-Hop',   bpm: 95 },
+  { id: 's7', title: 'Jazz Cafe Morning',    artist: 'JazzCat',     duration: '3:15', genre: 'Jazz',      bpm: 110 },
+  { id: 's8', title: 'Motivation Hard',      artist: 'GymBeats',    duration: '3:30', genre: 'Epic',      bpm: 155 },
+]
+
+export const templates = [
+  { id: 't1', name: 'YouTube Intro',      cat: 'Intro',       thumb: '#7C3AED' },
+  { id: 't2', name: 'TikTok Hook',        cat: 'Intro',       thumb: '#EC4899' },
+  { id: 't3', name: 'Subscribe Outro',    cat: 'Outro',       thumb: '#10B981' },
+  { id: 't4', name: 'Channel Outro',      cat: 'Outro',       thumb: '#06B6D4' },
+  { id: 't5', name: 'Name Lower Third',   cat: 'Lower Third', thumb: '#F59E0B' },
+  { id: 't6', name: 'Social Bug',         cat: 'Lower Third', thumb: '#EF4444' },
+  { id: 't7', name: 'Like+Subscribe CTA', cat: 'CTA',         thumb: '#8B5CF6' },
+  { id: 't8', name: 'End Screen',         cat: 'CTA',         thumb: '#D97706' },
+]
+
+export const transitions = [
+  { id: 'tr1', name: 'Cut',        icon: '✂️' },
+  { id: 'tr2', name: 'Dissolve',   icon: '🌊' },
+  { id: 'tr3', name: 'Fade Black', icon: '⬛' },
+  { id: 'tr4', name: 'Wipe Right', icon: '➡️' },
+  { id: 'tr5', name: 'Zoom In',    icon: '🔍' },
+  { id: 'tr6', name: 'Slide Up',   icon: '⬆️' },
+  { id: 'tr7', name: 'Glitch',     icon: '⚡' },
+  { id: 'tr8', name: 'Spin',       icon: '🌀' },
+  { id: 'tr9', name: 'Bounce',     icon: '🏀' },
+]
+
+export const colorPresets = [
+  { id: 'cp1', name: 'Cinematic', colors: ['#0A0A0A','#1A1A2E','#E94560'] },
+  { id: 'cp2', name: 'Warm Film', colors: ['#2C1810','#8B4513','#F4A460'] },
+  { id: 'cp3', name: 'Cold Steel', colors: ['#0D1B2A','#1B4F72','#85C1E9'] },
+  { id: 'cp4', name: 'Vivid Pop',  colors: ['#FF006E','#FB5607','#FFBE0B'] },
+  { id: 'cp5', name: 'Matte BW',  colors: ['#2D2D2D','#808080','#F0F0F0'] },
+  { id: 'cp6', name: 'Golden Hr', colors: ['#1A0A00','#8B4513','#FFD700'] },
 ]
 
 export const collaborators = [
-  { id: 1, name: 'Sarah Chen',  role: 'Editor',   color: '#EC4899', online: true  },
-  { id: 2, name: 'Marcus Kim',  role: 'Designer', color: '#06B6D4', online: false },
-  { id: 3, name: 'You',         role: 'Owner',    color: '#7C3AED', online: true  },
+  { id: 'u1', name: 'Sarah K', color: '#EC4899', online: true  },
+  { id: 'u2', name: 'Mike J',  color: '#06B6D4', online: true  },
+  { id: 'u3', name: 'Jordan L',color: '#D97706', online: false },
 ]
 
 export const comments = [
-  { id: 1, user: 'Sarah Chen',  userColor: '#EC4899', text: 'The transition at 0:35 feels abrupt. Try a cross-dissolve?', time: 35, ago: '2h ago',  resolved: false },
-  { id: 2, user: 'Marcus Kim',  userColor: '#06B6D4', text: 'Lower third looks great! Color matches the brand kit.', time: 9,  ago: '1d ago',  resolved: true  },
-  { id: 3, user: 'Sarah Chen',  userColor: '#EC4899', text: 'VO audio level is a bit low in the main section — boost +3dB?', time: 12, ago: '2d ago', resolved: false },
+  { id: 'cm1', user: 'Sarah K', color: '#EC4899', text: 'The intro hook is great!', time: '2m ago', at: 1.2 },
+  { id: 'cm2', user: 'Mike J',  color: '#06B6D4', text: 'Trim the B-roll a bit?',  time: '8m ago', at: 28 },
 ]
 
 export const versionHistory = [
-  { id: 1, label: 'v3 — Added B-Roll sequence',       ago: '2h ago',   user: 'Sarah Chen',  color: '#EC4899' },
-  { id: 2, label: 'v2 — Color grade pass',             ago: 'Yesterday', user: 'Alex Rivera', color: '#7C3AED' },
-  { id: 3, label: 'v1 — Initial cut',                  ago: '3 days ago',user: 'Alex Rivera', color: '#7C3AED' },
+  { id: 'v1h', label: 'v0.3 — Added voiceover', time: '10 min ago', author: 'You' },
+  { id: 'v2h', label: 'v0.2 — Color grade',      time: '1 hr ago',  author: 'Sarah K' },
+  { id: 'v3h', label: 'v0.1 — Initial cut',       time: '2 hrs ago', author: 'You' },
 ]
 
-export const textAnimations = ['None', 'Fade In', 'Slide Up', 'Pop', 'Typewriter', 'Bounce', 'Glow']
-export const fontFamilies = ['Inter', 'Poppins', 'Bebas Neue', 'Montserrat', 'Oswald', 'Playfair Display', 'Dancing Script']
-export const subtitleLanguages = ['English', 'Indonesian', 'Spanish', 'French', 'German', 'Japanese', 'Korean', 'Portuguese']
+export const textAnimations = ['Fade In','Slide Up','Typewriter','Pop','Bounce','Glitch','Neon']
+export const fontFamilies   = ['Inter','Montserrat','Bebas Neue','Roboto','Playfair','Impact','Space Grotesk']
+export const subtitleLanguages = ['English','Indonesian','Spanish','French','German','Japanese','Korean','Arabic']
+
+export const stockFootage = [
+  { id: 'sf1', name: 'City Timelapse 4K',  duration: '0:30', tags: 'city urban' },
+  { id: 'sf2', name: 'Nature Forest Walk', duration: '0:45', tags: 'nature forest' },
+  { id: 'sf3', name: 'Office Workspace',   duration: '0:20', tags: 'office work' },
+  { id: 'sf4', name: 'Tech Abstract BG',   duration: '0:15', tags: 'tech abstract' },
+  { id: 'sf5', name: 'People Walking',     duration: '0:25', tags: 'people street' },
+]

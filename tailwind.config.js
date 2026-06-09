@@ -17,8 +17,11 @@ export default {
           red:     '#EF4444',
           amber:   '#F59E0B',
         }
-      }
-    }
+      },
+      fontFamily: {
+        sans: ['Inter', 'system-ui', 'sans-serif'],
+      },
+    },
   },
   plugins: [],
 }

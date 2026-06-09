@@ -1,153 +1,78 @@
 import { useState } from 'react'
-import { X, Download, Check } from 'lucide-react'
-
-const PLATFORMS = [
-  { id: 'youtube', label: 'YouTube', sub: '16:9 · 1080p recommended', color: '#FF0000' },
-  { id: 'tiktok',  label: 'TikTok',  sub: '9:16 · 1080p recommended', color: '#69C9D0' },
-  { id: 'ig_reel', label: 'IG Reel', sub: '9:16 · 1080p recommended', color: '#E1306C' },
-  { id: 'custom',  label: 'Custom',  sub: 'Set your own settings',     color: '#7C3AED' },
-]
+import { X, Download, CheckCircle2 } from 'lucide-react'
 
 export default function ExportModal({ onClose }) {
-  const [step, setStep] = useState('settings') // settings | exporting | done
-  const [progress, setProgress] = useState(0)
-  const [preset, setPreset] = useState('youtube')
-  const [resolution, setResolution] = useState('1080p')
-  const [quality, setQuality] = useState('High')
-  const [subtitles, setSubtitles] = useState('burn')
-  const [format, setFormat] = useState('MP4')
+  const [exporting, setExporting] = useState(false)
+  const [done, setDone]           = useState(false)
+  const [progress, setProgress]   = useState(0)
+  const [format, setFormat]       = useState('mp4')
+  const [quality, setQuality]     = useState('1080p')
 
   const startExport = () => {
-    setStep('exporting')
+    setExporting(true)
     let p = 0
     const iv = setInterval(() => {
       p += Math.random() * 8 + 2
-      setProgress(Math.min(100, p))
-      if (p >= 100) { clearInterval(iv); setStep('done') }
+      if (p >= 100) { clearInterval(iv); setProgress(100); setExporting(false); setDone(true) }
+      else setProgress(Math.min(p, 99))
     }, 200)
   }
 
-  const sizeEst = { '720p': '280 MB', '1080p': '680 MB', '4K': '2.4 GB' }
-
   return (
-    <div className="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-      <div className="bg-[#141414] border border-[#2A2A2A] rounded-2xl w-full max-w-md shadow-2xl">
-        <div className="flex items-center justify-between px-5 py-4 border-b border-[#1F1F1F]">
-          <h3 className="font-bold text-zinc-100">{step === 'done' ? 'Export Complete' : 'Export Video'}</h3>
-          <button onClick={onClose} className="text-zinc-600 hover:text-zinc-300 transition-colors"><X size={18} /></button>
+    <div className="fixed inset-0 z-[8000] flex items-center justify-center bg-black/70 backdrop-blur-sm">
+      <div className="bg-[#161616] border border-[#2A2A2A] rounded-2xl shadow-2xl w-96 overflow-hidden">
+        <div className="flex items-center justify-between px-5 py-4 border-b border-[#222]">
+          <div className="flex items-center gap-2"><Download size={15} className="text-violet-400" /><p className="font-semibold text-zinc-100 text-sm">Export Video</p></div>
+          <button onClick={onClose} className="text-zinc-500 hover:text-zinc-300"><X size={16} /></button>
         </div>
 
-        <div className="p-5">
-          {step === 'settings' && (
-            <div className="space-y-4">
-              {/* Platform presets */}
+        <div className="p-5 flex flex-col gap-4">
+          {done ? (
+            <div className="flex flex-col items-center gap-3 py-4">
+              <CheckCircle2 size={40} className="text-emerald-400" />
+              <p className="font-semibold text-zinc-100">Export Complete!</p>
+              <p className="text-xs text-zinc-500">Your video has been exported successfully.</p>
+              <button onClick={onClose} className="btn-accent mt-2">Close</button>
+            </div>
+          ) : (
+            <>
               <div>
-                <label className="field-label">Optimized for</label>
-                <div className="grid grid-cols-4 gap-1.5">
-                  {PLATFORMS.map(p => (
-                    <button key={p.id} onClick={() => setPreset(p.id)}
-                      className={`flex flex-col items-center gap-1 p-2 rounded-xl border text-center transition-all ${preset === p.id ? 'border-violet-500 bg-violet-900/30' : 'border-[#2A2A2A] hover:border-[#383838]'}`}>
-                      <div className="w-6 h-6 rounded-lg" style={{ backgroundColor: p.color + '40' }} />
-                      <span className="text-[10px] font-medium text-zinc-300">{p.label}</span>
+                <label className="field-label">Format</label>
+                <div className="flex gap-2">
+                  {['mp4','mov','webm'].map(f => (
+                    <button key={f} onClick={() => setFormat(f)}
+                      className={`flex-1 py-1.5 rounded-lg text-xs font-medium transition-all border ${format===f ? 'border-violet-500 text-violet-300 bg-violet-900/40' : 'border-[#2A2A2A] text-zinc-500 hover:text-zinc-300'}`}>
+                      .{f}
                     </button>
                   ))}
                 </div>
               </div>
-
-              <div className="grid grid-cols-2 gap-3">
-                <div>
-                  <label className="field-label">Format</label>
-                  <select value={format} onChange={e => setFormat(e.target.value)} className="input-dark text-[11px]">
-                    {['MP4','MOV','WebM','GIF','AVI'].map(f => <option key={f}>{f}</option>)}
-                  </select>
-                </div>
-                <div>
-                  <label className="field-label">Resolution</label>
-                  <select value={resolution} onChange={e => setResolution(e.target.value)} className="input-dark text-[11px]">
-                    {['720p','1080p','4K'].map(r => <option key={r}>{r}</option>)}
-                  </select>
-                </div>
-              </div>
-
-              <div className="grid grid-cols-2 gap-3">
-                <div>
-                  <label className="field-label">Quality</label>
-                  <select value={quality} onChange={e => setQuality(e.target.value)} className="input-dark text-[11px]">
-                    {['Low','Medium','High','Lossless'].map(q => <option key={q}>{q}</option>)}
-                  </select>
-                </div>
-                <div>
-                  <label className="field-label">FPS</label>
-                  <select className="input-dark text-[11px]">
-                    {['24','30','60'].map(f => <option key={f}>{f} fps</option>)}
-                  </select>
-                </div>
-              </div>
-
               <div>
-                <label className="field-label">Subtitles</label>
-                <div className="space-y-1.5">
-                  {[['burn','Burn into video'],['srt','Export .SRT file'],['none','No subtitles']].map(([v,l]) => (
-                    <label key={v} className="flex items-center gap-2 text-xs text-zinc-400 cursor-pointer">
-                      <input type="radio" name="sub" value={v} checked={subtitles === v} onChange={() => setSubtitles(v)} className="accent-violet-500" />
-                      {l}
-                    </label>
-                  ))}
+                <label className="field-label">Quality</label>
+                <select value={quality} onChange={e => setQuality(e.target.value)} className="input-dark">
+                  <option>4K UHD (2160p)</option>
+                  <option>1080p HD</option>
+                  <option>720p</option>
+                  <option>480p</option>
+                </select>
+              </div>
+              {exporting && (
+                <div>
+                  <div className="flex justify-between text-xs text-zinc-400 mb-1.5">
+                    <span>Exporting…</span><span>{Math.round(progress)}%</span>
+                  </div>
+                  <div className="h-2 bg-[#2A2A2A] rounded-full overflow-hidden">
+                    <div className="h-full bg-violet-500 rounded-full transition-all" style={{ width: `${progress}%` }} />
+                  </div>
                 </div>
+              )}
+              <div className="flex gap-2 justify-end mt-1">
+                <button onClick={onClose} className="btn-ghost">Cancel</button>
+                <button onClick={startExport} disabled={exporting} className="btn-accent">
+                  <Download size={13} /> {exporting ? 'Exporting…' : 'Export'}
+                </button>
               </div>
-
-              <label className="flex items-center gap-2 text-xs text-zinc-400 cursor-pointer">
-                <input type="checkbox" defaultChecked className="accent-violet-500" />
-                Smart compression (recommended)
-              </label>
-
-              <div className="flex items-center justify-between py-2.5 px-3 bg-[#1A1A1A] rounded-xl border border-[#2A2A2A]">
-                <span className="text-xs text-zinc-500">Estimated file size</span>
-                <span className="text-sm font-bold text-zinc-200">{sizeEst[resolution] || '680 MB'}</span>
-              </div>
-
-              <button onClick={startExport} className="w-full btn-accent justify-center py-2.5 text-sm">
-                <Download size={15} /> Start Export
-              </button>
-            </div>
-          )}
-
-          {step === 'exporting' && (
-            <div className="py-6 text-center space-y-4">
-              <div className="w-16 h-16 rounded-full bg-violet-900/40 border-2 border-violet-600 flex items-center justify-center mx-auto">
-                <Download size={24} className="text-violet-400" />
-              </div>
-              <div>
-                <p className="font-semibold text-zinc-200 mb-1">Rendering your video…</p>
-                <p className="text-sm text-zinc-500">{resolution} · {format} · {quality} quality</p>
-              </div>
-              <div className="space-y-1.5">
-                <div className="flex justify-between text-xs text-zinc-500 mb-1">
-                  <span>Progress</span>
-                  <span>{Math.round(progress)}%</span>
-                </div>
-                <div className="h-2 bg-[#1A1A1A] rounded-full overflow-hidden">
-                  <div className="h-full bg-violet-600 rounded-full transition-all duration-200" style={{ width: `${progress}%` }} />
-                </div>
-              </div>
-              <p className="text-xs text-zinc-600">Using GPU acceleration</p>
-            </div>
-          )}
-
-          {step === 'done' && (
-            <div className="py-6 text-center space-y-4">
-              <div className="w-16 h-16 rounded-full bg-emerald-900/40 border-2 border-emerald-600 flex items-center justify-center mx-auto">
-                <Check size={28} className="text-emerald-400" />
-              </div>
-              <div>
-                <p className="font-semibold text-zinc-200 mb-1">Export Complete!</p>
-                <p className="text-sm text-zinc-500">Your video is ready to download.</p>
-              </div>
-              <div className="flex gap-2">
-                <button onClick={onClose} className="flex-1 btn-surface justify-center">Close</button>
-                <button className="flex-1 btn-accent justify-center"><Download size={14} /> Download</button>
-              </div>
-            </div>
+            </>
           )}
         </div>
       </div>
