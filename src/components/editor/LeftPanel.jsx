@@ -10,6 +10,10 @@ import {
 } from '../../data/editorData'
 import AddMediaModal from './AddMediaModal'
 import ConfirmDialog from '../ui/ConfirmDialog'
+import { getEntry, getBlobUrl } from '../../utils/fileRegistry'
+import { transcribeAudio, segmentTranscript } from '../../utils/hfApi'
+import { parseDur } from '../../utils/helpers'
+import { useToast } from '../../context/ToastContext'
 
 const TABS = [
   { id: 'media',     icon: FolderOpen,     label: 'Media'     },
@@ -66,6 +70,7 @@ export default function LeftPanel({
   captions, onAddCaption, onUpdateCaption, onDeleteCaption, onGenerateCaptions,
   comments, collaborators, versionHistory: verHist,
 }) {
+  const toast = useToast()
   const [search, setSearch]           = useState('')
   const [musicGenre, setMusicGenre]   = useState('All')
   const [aiStates, setAiStates]       = useState({})
@@ -114,9 +119,42 @@ export default function LeftPanel({
     setNewCap(false); setNewCapText(''); setNewCapStart(''); setNewCapEnd('')
   }
 
-  const doGenerateCaps = () => {
+  const doGenerateCaps = async () => {
+    // Find an audio file in mediaFiles that has a real file uploaded
+    const audioMedia = mediaFiles?.find(m => (m.type === 'audio' || m.type === 'video') && getBlobUrl(m.id))
+
+    if (!audioMedia) {
+      // Fallback: generate dummy captions but with toast
+      toast.add('Tidak ada file audio yang diupload. Menggunakan AI simulasi...', 'info')
+      setGeneratingCaps(true)
+      setTimeout(() => { onGenerateCaptions(); setGeneratingCaps(false) }, 2200)
+      return
+    }
+
     setGeneratingCaps(true)
-    setTimeout(() => { onGenerateCaptions(); setGeneratingCaps(false) }, 2000)
+    const entry = getEntry(audioMedia.id)
+    try {
+      toast.add('Mengirim audio ke Whisper AI...', 'info')
+      const result = await transcribeAudio(entry.file)
+      const dur = parseDur(audioMedia.duration)
+      const segments = result.chunks?.length > 0
+        ? result.chunks.map(c => ({ text: c.text.trim(), start: c.timestamp[0], end: c.timestamp[1] || c.timestamp[0] + 3 }))
+        : segmentTranscript(result.text || '', dur)
+      segments.forEach(s => onAddCaption(s))
+      toast.add(`${segments.length} caption berhasil dibuat!`, 'success')
+    } catch (err) {
+      if (err.message === 'loading') {
+        toast.add('Model AI sedang loading, coba lagi dalam 20 detik...', 'warning')
+      } else if (err.message === 'quota' || err.message === 'timeout') {
+        toast.add('Maaf antrian proses sedang penuh, mohon tunggu', 'warning')
+      } else {
+        toast.add('Maaf antrian proses sedang penuh, mohon tunggu', 'warning')
+      }
+      // Fallback to simulation
+      onGenerateCaptions()
+    } finally {
+      setGeneratingCaps(false)
+    }
   }
 
   return (

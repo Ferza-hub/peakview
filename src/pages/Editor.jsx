@@ -12,6 +12,9 @@ import { initialTracks, mediaFiles as defaultMedia, collaborators, comments, ver
 import { getProjectData, saveProjectData, upsertProjectMeta, getProjects } from '../utils/storage'
 import { genId, deepClone, parseDur } from '../utils/helpers'
 import { useToast } from '../context/ToastContext'
+import { setThumbnail, setWaveform } from '../utils/fileRegistry'
+import { extractThumbnail } from '../utils/thumbnail'
+import { computeWaveform } from '../utils/waveform'
 
 const MAX_HIST = 30
 
@@ -146,6 +149,15 @@ export default function Editor() {
     }
     commit(newTracks, newMedia)
     toast.add(`"${item.name}" added`, 'success')
+    // Async: generate thumbnail + waveform from real uploaded file
+    if (item.file) {
+      if (item.type === 'video') {
+        extractThumbnail(item.file).then(thumb => setThumbnail(item.id, thumb)).catch(() => {})
+      }
+      if (item.type === 'audio' || item.type === 'video') {
+        computeWaveform(item.file).then(wf => setWaveform(item.id, wf)).catch(() => {})
+      }
+    }
   }, [mediaFiles, tracks, commit, toast])
 
   const updateMedia = useCallback((id, patch) => {
@@ -261,6 +273,7 @@ export default function Editor() {
 
         <div className="flex-1 flex flex-col overflow-hidden min-w-0">
           <Preview
+            tracks={tracks}
             playing={playing} setPlaying={setPlaying}
             currentTime={currentTime} setCurrentTime={setCurrentTime}
             totalDuration={TOTAL_DURATION} selectedClip={selectedClip} format={format}
