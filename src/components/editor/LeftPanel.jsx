@@ -66,7 +66,7 @@ function AITool({ icon: Icon, title, desc, badge, onRun, state }) {
 
 export default function LeftPanel({
   activeTab, setActiveTab,
-  mediaFiles, onAddMedia, onUpdateMedia, onDeleteMedia,
+  mediaFiles, onAddMedia, onUpdateMedia, onDeleteMedia, onAddToTimeline,
   captions, onAddCaption, onUpdateCaption, onDeleteCaption, onGenerateCaptions,
   comments, collaborators, versionHistory: verHist,
 }) {
@@ -187,7 +187,7 @@ export default function LeftPanel({
                 <button onClick={() => setShowAddMedia(true)} className="btn-accent px-2 py-1 text-[11px]"><Plus size={12} /></button>
               </div>
 
-              <p className="text-[10px] text-zinc-600 mb-2">{filteredMedia.length} file{filteredMedia.length !== 1 ? 's' : ''} — drag to timeline</p>
+              <p className="text-[10px] text-zinc-600 mb-2">{filteredMedia.length} file{filteredMedia.length !== 1 ? 's' : ''} — drag or tap + to add</p>
 
               <div className="flex flex-col gap-1">
                 {filteredMedia.map(m => {
@@ -205,11 +205,18 @@ export default function LeftPanel({
                         <p className="text-[11px] text-zinc-300 truncate font-medium">{m.name}</p>
                         <p className="text-[9px] text-zinc-600">{m.type} · {m.duration}</p>
                       </div>
-                      <div className="flex gap-0.5 opacity-0 group-hover:opacity-100 transition-opacity">
-                        <button onClick={() => { setEditMedia(m) }} className="p-1 text-zinc-500 hover:text-zinc-300 transition-colors">
+                      <div className="flex gap-0.5">
+                        <button
+                          onClick={() => onAddToTimeline && onAddToTimeline(m)}
+                          title="Add to timeline"
+                          className="p-1.5 text-violet-500 hover:text-violet-300 transition-colors"
+                        >
+                          <Plus size={11} />
+                        </button>
+                        <button onClick={() => { setEditMedia(m) }} className="p-1.5 text-zinc-600 hover:text-zinc-300 transition-colors opacity-0 group-hover:opacity-100">
                           <Pencil size={10} />
                         </button>
-                        <button onClick={() => setConfirmDelMedia(m)} className="p-1 text-zinc-500 hover:text-red-400 transition-colors">
+                        <button onClick={() => setConfirmDelMedia(m)} className="p-1.5 text-zinc-600 hover:text-red-400 transition-colors opacity-0 group-hover:opacity-100">
                           <Trash2 size={10} />
                         </button>
                       </div>

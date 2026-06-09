@@ -197,6 +197,20 @@ export default function Editor() {
     toast.add('Clip deleted', 'error')
   }, [confirmDel, tracks, mediaFiles, commit, selectedClip, toast])
 
+  const addMediaToTimeline = useCallback((item) => {
+    const map = { video:'v1', audio:'a1', image:'v2', subtitle:'sub' }
+    const tId = map[item.type] || 'v1'
+    const trk = tracks.find(t => t.id === tId)
+    if (!trk || trk.locked) { toast.add('Track is locked', 'warning'); return }
+    const last = trk.clips[trk.clips.length - 1]
+    const start = last ? last.start + last.duration : 0
+    const dur = parseDur(item.duration)
+    const clip = { id: genId(), label: item.name, start, duration: dur, color: item.color, type: item.type, mediaId: item.id }
+    const newTracks = tracks.map(t => t.id === tId ? { ...t, clips: [...t.clips, clip] } : t)
+    commit(newTracks, mediaFiles)
+    toast.add(`"${item.name}" added to timeline`, 'success')
+  }, [tracks, mediaFiles, commit, toast])
+
   const splitClip = useCallback((trackId, clipId) => {
     const trk = tracks.find(t => t.id === trackId)
     const clip = trk?.clips.find(c => c.id === clipId)
@@ -268,6 +282,7 @@ export default function Editor() {
           captions={tracks.find(t => t.id === 'sub')?.clips || []}
           onAddCaption={addCaption} onUpdateCaption={updateCaption}
           onDeleteCaption={deleteCaption} onGenerateCaptions={generateCaptions}
+          onAddToTimeline={addMediaToTimeline}
           comments={comments} collaborators={collaborators} versionHistory={versionHistory}
         />
 

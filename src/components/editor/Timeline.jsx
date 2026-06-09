@@ -94,15 +94,15 @@ export default function Timeline({
     setCurrentTime(clamp((e.clientX - rect.left) / pps, 0, totalDuration))
   }
 
-  // ── Mouse drag (move / resize) ─────────────────────────────────────────────
+  // ── Pointer drag (move / resize) — works on mouse + touch ─────────────────
   const startDrag = (e, trackId, clip, mode) => {
     e.preventDefault(); e.stopPropagation()
     const track = local.find(t => t.id === trackId)
     if (!track || track.locked) return
     onSelectClip(clip, track)
     dragRef.current = { mode, clipId: clip.id, trackId, startX: e.clientX, origStart: clip.start, origDur: clip.duration }
-    document.addEventListener('mousemove', onDragMove)
-    document.addEventListener('mouseup',   onDragUp)
+    document.addEventListener('pointermove', onDragMove)
+    document.addEventListener('pointerup',   onDragUp)
   }
 
   const onDragMove = useCallback((e) => {
@@ -134,8 +134,8 @@ export default function Timeline({
   }, [pps, totalDuration])
 
   const onDragUp = useCallback(() => {
-    document.removeEventListener('mousemove', onDragMove)
-    document.removeEventListener('mouseup',   onDragUp)
+    document.removeEventListener('pointermove', onDragMove)
+    document.removeEventListener('pointerup',   onDragUp)
     setLocal(cur => { onTracksChange(cur); return cur })
     dragRef.current = null
   }, [onDragMove, onTracksChange])
@@ -262,9 +262,10 @@ export default function Timeline({
                         backgroundColor: clip.color + '30',
                         borderLeft: `2.5px solid ${clip.color}`,
                         opacity: track.muted ? 0.3 : 1,
+                        touchAction: 'none',
                       }}
                       onClick={e => { e.stopPropagation(); !track.locked && onSelectClip(clip, track) }}
-                      onMouseDown={e => !track.locked && startDrag(e, track.id, clip, 'move')}
+                      onPointerDown={e => !track.locked && startDrag(e, track.id, clip, 'move')}
                     >
                       {/* Real waveform for audio tracks */}
                       {(track.type === 'audio') && clip.mediaId && (
@@ -298,8 +299,8 @@ export default function Timeline({
                       {/* Delete × */}
                       {isSel && !track.locked && (
                         <button
-                          className="absolute top-0.5 right-0.5 w-3.5 h-3.5 rounded-full bg-red-600/90 hover:bg-red-500 flex items-center justify-center z-20 transition-colors"
-                          onMouseDown={e => e.stopPropagation()}
+                          className="absolute top-0.5 right-0.5 w-4 h-4 rounded-full bg-red-600/90 hover:bg-red-500 flex items-center justify-center z-20 transition-colors"
+                          onPointerDown={e => e.stopPropagation()}
                           onClick={e => { e.stopPropagation(); onDeleteClip(track.id, clip.id, clip.label) }}
                         >
                           <X size={8} className="text-white" />
@@ -310,12 +311,14 @@ export default function Timeline({
                       {isSel && !track.locked && (
                         <>
                           <div
-                            className="absolute left-0 inset-y-0 w-2 cursor-w-resize bg-white/20 hover:bg-white/40 z-20 transition-colors"
-                            onMouseDown={e => startDrag(e, track.id, clip, 'left')}
+                            className="absolute left-0 inset-y-0 w-3 cursor-w-resize bg-white/20 hover:bg-white/40 z-20 transition-colors"
+                            style={{ touchAction: 'none' }}
+                            onPointerDown={e => startDrag(e, track.id, clip, 'left')}
                           />
                           <div
-                            className="absolute right-0 inset-y-0 w-2 cursor-e-resize bg-white/20 hover:bg-white/40 z-20 transition-colors"
-                            onMouseDown={e => startDrag(e, track.id, clip, 'right')}
+                            className="absolute right-0 inset-y-0 w-3 cursor-e-resize bg-white/20 hover:bg-white/40 z-20 transition-colors"
+                            style={{ touchAction: 'none' }}
+                            onPointerDown={e => startDrag(e, track.id, clip, 'right')}
                           />
                         </>
                       )}
