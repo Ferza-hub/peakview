@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useRef } from 'react'
 import {
   FolderOpen, LayoutTemplate, Type, Music, Sparkles, Cpu, Package, Users,
   Plus, Search, Play, Check, Pencil, Trash2, X, Mic, Globe, RefreshCw, Zap,
@@ -69,12 +69,17 @@ export default function LeftPanel({
   mediaFiles, onAddMedia, onUpdateMedia, onDeleteMedia, onAddToTimeline,
   captions, onAddCaption, onUpdateCaption, onDeleteCaption, onGenerateCaptions,
   comments, collaborators, versionHistory: verHist,
+  onEffectChange,    // called with { type: 'color', filter: cssString, presetId }
+  onTransitionSelect, // called with transition id string
 }) {
   const toast = useToast()
+  const [selectedTransition, setSelectedTransition] = useState(null)
+  const [selectedPreset, setSelectedPreset]         = useState(null)
+  const [playingTrack, setPlayingTrack]             = useState(null)
+  const audioCtxRef = useRef(null)
   const [search, setSearch]           = useState('')
   const [musicGenre, setMusicGenre]   = useState('All')
   const [aiStates, setAiStates]       = useState({})
-  const [playingTrack, setPlayingTrack] = useState(null)
   const [showAddMedia, setShowAddMedia] = useState(false)
   const [editMedia, setEditMedia]     = useState(null)
   const [confirmDelMedia, setConfirmDelMedia] = useState(null)
@@ -88,6 +93,64 @@ export default function LeftPanel({
   const [newCapStart, setNewCapStart] = useState('')
   const [newCapEnd, setNewCapEnd]     = useState('')
   const [generatingCaps, setGeneratingCaps] = useState(false)
+
+  const COLOR_FILTERS = {
+    'cp1': 'saturate(0.6) contrast(1.35) brightness(0.82)',
+    'cp2': 'sepia(0.5) saturate(1.5) hue-rotate(-8deg) brightness(1.08)',
+    'cp3': 'saturate(0.35) hue-rotate(180deg) brightness(1.18) contrast(1.1)',
+    'cp4': 'saturate(2.8) contrast(1.15) brightness(1.05)',
+    'cp5': 'saturate(0) contrast(1.4) brightness(1.12)',
+    'cp6': 'sepia(0.7) saturate(1.8) brightness(0.92) contrast(1.15)',
+  }
+
+  const GENRE_CHORDS = {
+    'Lo-Fi':     [[261.63, 329.63, 392.00], [220.00, 277.18, 329.63]],
+    'Epic':      [[87.31, 174.61, 261.63],  [73.42, 146.83, 220.00]],
+    'Corporate': [[293.66, 369.99, 440.00], [261.63, 329.63, 392.00]],
+    'Pop':       [[261.63, 329.63, 523.25], [349.23, 440.00, 523.25]],
+    'Ambient':   [[110.00, 165.00, 220.00], [138.59, 207.65, 277.18]],
+    'Hip-Hop':   [[87.31, 130.81, 174.61],  [73.42, 110.00, 146.83]],
+    'Jazz':      [[261.63, 329.63, 392.00, 466.16], [220.00, 277.18, 349.23, 415.30]],
+  }
+
+  const playMusicPreview = (trackId, genre) => {
+    // Toggle off
+    if (playingTrack === trackId) {
+      if (audioCtxRef.current) { audioCtxRef.current.close(); audioCtxRef.current = null }
+      setPlayingTrack(null)
+      return
+    }
+    if (audioCtxRef.current) { audioCtxRef.current.close(); audioCtxRef.current = null }
+
+    try {
+      const ctx = new (window.AudioContext || window.webkitAudioContext)()
+      audioCtxRef.current = ctx
+      const chords = GENRE_CHORDS[genre] || GENRE_CHORDS['Lo-Fi']
+      const master = ctx.createGain()
+      master.gain.setValueAtTime(0.18, ctx.currentTime)
+      master.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 3.5)
+      master.connect(ctx.destination)
+
+      chords.forEach((chord, ci) => {
+        chord.forEach(freq => {
+          const osc  = ctx.createOscillator()
+          const gain = ctx.createGain()
+          osc.type = ['Lo-Fi','Ambient','Jazz'].includes(genre) ? 'sine' : 'triangle'
+          osc.frequency.setValueAtTime(freq, ctx.currentTime + ci * 1.2)
+          gain.gain.setValueAtTime(0.35 / chord.length, ctx.currentTime + ci * 1.2)
+          gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + ci * 1.2 + 1.3)
+          osc.connect(gain); gain.connect(master)
+          osc.start(ctx.currentTime + ci * 1.2)
+          osc.stop(ctx.currentTime + ci * 1.2 + 1.5)
+        })
+      })
+
+      setPlayingTrack(trackId)
+      setTimeout(() => setPlayingTrack(null), 3500)
+    } catch(e) {
+      toast.add('Audio preview not available', 'warning')
+    }
+  }
 
   const runAI = (key) => {
     setAiStates(p => ({ ...p, [key]: 'processing' }))
@@ -348,9 +411,13 @@ export default function LeftPanel({
                     draggable
                     onDragStart={e => e.dataTransfer.setData('application/peakedit-media', JSON.stringify({ id: m.id, name: m.title, type: 'audio', duration: m.duration, color: '#10B981' }))}
                     className="flex items-center gap-2 px-2 py-1.5 rounded-lg bg-[#141414] border border-[#1F1F1F] hover:border-[#2A2A2A] cursor-grab group transition-all">
-                    <button onClick={() => setPlayingTrack(playingTrack===m.id ? null : m.id)}
-                      className="w-6 h-6 rounded-full bg-violet-900/60 flex items-center justify-center shrink-0 hover:bg-violet-600 transition-colors">
-                      <Play size={9} className="text-violet-300 ml-0.5" />
+                    <button onClick={() => playMusicPreview(m.id, m.genre)}
+                      className={`w-6 h-6 rounded-full flex items-center justify-center shrink-0 transition-colors ${
+                        playingTrack === m.id
+                          ? 'bg-emerald-600 animate-pulse'
+                          : 'bg-violet-900/60 hover:bg-violet-600'
+                      }`}>
+                      <Play size={9} className={`${playingTrack === m.id ? 'text-white' : 'text-violet-300'} ml-0.5`} />
                     </button>
                     <div className="flex-1 min-w-0">
                       <p className="text-[11px] text-zinc-300 truncate font-medium">{m.title}</p>
@@ -368,7 +435,17 @@ export default function LeftPanel({
               <SLabel>Transitions</SLabel>
               <div className="grid grid-cols-3 gap-1.5 mb-3">
                 {transitions.map(t => (
-                  <button key={t.id} className="flex flex-col items-center gap-1 p-2 rounded-lg bg-[#141414] border border-[#1F1F1F] hover:border-violet-500/50 text-xs text-zinc-500 hover:text-violet-300 transition-all">
+                  <button key={t.id}
+                    onClick={() => {
+                      setSelectedTransition(t.id)
+                      if (onTransitionSelect) onTransitionSelect(t.id)
+                      toast.add(`Transition: ${t.name}`, 'info')
+                    }}
+                    className={`flex flex-col items-center gap-1 p-2 rounded-lg border text-xs transition-all ${
+                      selectedTransition === t.id
+                        ? 'border-violet-500 bg-violet-900/40 text-violet-300'
+                        : 'border-[#1F1F1F] bg-[#141414] hover:border-violet-500/50 text-zinc-500 hover:text-violet-300'
+                    }`}>
                     <span className="text-base">{t.icon}</span>
                     <span className="text-[9px]">{t.name}</span>
                   </button>
@@ -377,12 +454,23 @@ export default function LeftPanel({
               <SLabel>Color Presets</SLabel>
               <div className="grid grid-cols-2 gap-1.5">
                 {colorPresets.map(p => (
-                  <button key={p.id} className="rounded-lg overflow-hidden border border-[#1F1F1F] hover:border-[#2A2A2A] transition-all">
-                    <div className="h-8 flex" >
+                  <button key={p.id}
+                    onClick={() => {
+                      const newId = selectedPreset === p.id ? null : p.id
+                      setSelectedPreset(newId)
+                      const filter = newId ? COLOR_FILTERS[p.id] || '' : ''
+                      if (onEffectChange) onEffectChange({ type: 'color', filter, presetId: newId })
+                      toast.add(newId ? `Color: ${p.name}` : 'Color reset', 'info')
+                    }}
+                    className={`rounded-lg overflow-hidden border transition-all ${
+                      selectedPreset === p.id ? 'border-violet-500 ring-1 ring-violet-500/50' : 'border-[#1F1F1F] hover:border-[#2A2A2A]'
+                    }`}>
+                    <div className="h-8 flex">
                       {p.colors.map((c,i) => <div key={i} className="flex-1" style={{ background: c }} />)}
                     </div>
-                    <div className="px-1.5 py-1 bg-[#141414]">
+                    <div className="px-1.5 py-1 bg-[#141414] flex items-center justify-between">
                       <p className="text-[10px] text-zinc-400">{p.name}</p>
+                      {selectedPreset === p.id && <div className="w-1.5 h-1.5 rounded-full bg-violet-400" />}
                     </div>
                   </button>
                 ))}

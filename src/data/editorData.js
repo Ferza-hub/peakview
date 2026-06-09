@@ -4,11 +4,11 @@ export const initialTracks = [
   {
     id: 'v1', label: 'V1 Main', type: 'video', muted: false, locked: false, height: 44,
     clips: [
-      { id: 'c1', label: 'Intro Hook', start: 0, duration: 8, color: '#7C3AED', type: 'video' },
-      { id: 'c2', label: 'Main Content A', start: 9, duration: 18, color: '#6D28D9', type: 'video' },
-      { id: 'c3', label: 'B-Roll Insert', start: 28, duration: 10, color: '#5B21B6', type: 'video' },
-      { id: 'c4', label: 'Main Content B', start: 39, duration: 15, color: '#7C3AED', type: 'video' },
-      { id: 'c5', label: 'Outro', start: 55, duration: 10, color: '#4C1D95', type: 'video' },
+      { id: 'c1', label: 'Intro Hook',     start: 0,  duration: 8,  color: '#7C3AED', type: 'video', mediaId: 'm1' },
+      { id: 'c2', label: 'Main Content A', start: 9,  duration: 18, color: '#6D28D9', type: 'video', mediaId: 'm1' },
+      { id: 'c3', label: 'B-Roll Insert',  start: 28, duration: 10, color: '#5B21B6', type: 'video', mediaId: 'm2' },
+      { id: 'c4', label: 'Main Content B', start: 39, duration: 15, color: '#7C3AED', type: 'video', mediaId: 'm1' },
+      { id: 'c5', label: 'Outro',          start: 55, duration: 10, color: '#4C1D95', type: 'video', mediaId: 'm4' },
     ]
   },
   {

@@ -39,6 +39,8 @@ export default function Editor() {
   const [showExport, setShowExport]   = useState(false)
   const [showPublish, setShowPublish] = useState(false)
   const [confirmDel, setConfirmDel]   = useState(null)
+  const [colorFilter, setColorFilter] = useState('')
+  const [activeTransition, setActiveTransition] = useState(null)
 
   // Load project
   useEffect(() => {
@@ -284,6 +286,8 @@ export default function Editor() {
           onDeleteCaption={deleteCaption} onGenerateCaptions={generateCaptions}
           onAddToTimeline={addMediaToTimeline}
           comments={comments} collaborators={collaborators} versionHistory={versionHistory}
+          onEffectChange={({ filter }) => setColorFilter(filter)}
+          onTransitionSelect={setActiveTransition}
         />
 
         <div className="flex-1 flex flex-col overflow-hidden min-w-0">
@@ -292,6 +296,8 @@ export default function Editor() {
             playing={playing} setPlaying={setPlaying}
             currentTime={currentTime} setCurrentTime={setCurrentTime}
             totalDuration={TOTAL_DURATION} selectedClip={selectedClip} format={format}
+            mediaFiles={mediaFiles}
+            colorFilter={colorFilter}
           />
           <Timeline
             tracks={tracks} currentTime={currentTime} setCurrentTime={setCurrentTime}
