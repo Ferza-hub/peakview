@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { X, Share2, Youtube, Instagram, CheckCircle2 } from 'lucide-react'
 
 const PLATFORMS = [
@@ -8,6 +8,12 @@ const PLATFORMS = [
 ]
 
 export default function PublishModal({ onClose }) {
+  useEffect(() => {
+    const h = (e) => { if (e.key === 'Escape') onClose() }
+    window.addEventListener('keydown', h)
+    return () => window.removeEventListener('keydown', h)
+  }, [onClose])
+
   const [platform, setPlatform] = useState('youtube')
   const [title, setTitle]       = useState('')
   const [desc, setDesc]         = useState('')
@@ -21,7 +27,8 @@ export default function PublishModal({ onClose }) {
   }
 
   return (
-    <div className="fixed inset-0 z-[8000] flex items-center justify-center bg-black/70 backdrop-blur-sm">
+    <div className="fixed inset-0 z-[8000] flex items-center justify-center bg-black/70 backdrop-blur-sm"
+      onClick={e => e.target === e.currentTarget && onClose()}>
       <div className="bg-[#161616] border border-[#2A2A2A] rounded-2xl shadow-2xl w-96 overflow-hidden">
         <div className="flex items-center justify-between px-5 py-4 border-b border-[#222]">
           <div className="flex items-center gap-2"><Share2 size={15} className="text-violet-400" /><p className="font-semibold text-zinc-100 text-sm">Publish</p></div>

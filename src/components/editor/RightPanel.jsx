@@ -1,6 +1,18 @@
-import { Sliders, Palette, Move, Type, Volume2 } from 'lucide-react'
+import { useState, useEffect } from 'react'
+import { Palette, Move, Volume2 } from 'lucide-react'
 
 export default function RightPanel({ selectedClip, format, setFormat }) {
+  const [transform, setTransform] = useState({ X: '0', Y: '0', Scale: '100', Rotation: '0' })
+  const [color, setColor]         = useState({ Brightness: 100, Contrast: 100, Saturation: 100 })
+  const [volume, setVolume]       = useState(100)
+
+  // reset when clip selection changes
+  useEffect(() => {
+    setTransform({ X: '0', Y: '0', Scale: '100', Rotation: '0' })
+    setColor({ Brightness: 100, Contrast: 100, Saturation: 100 })
+    setVolume(100)
+  }, [selectedClip?.id])
+
   return (
     <div className="w-52 shrink-0 bg-[#111111] border-l border-[#1F1F1F] flex flex-col overflow-y-auto">
       <div className="px-3 py-2.5 border-b border-[#1F1F1F]">
@@ -16,28 +28,54 @@ export default function RightPanel({ selectedClip, format, setFormat }) {
         <div className="p-3 flex flex-col gap-4">
           <section>
             <p className="panel-label flex items-center gap-1.5"><Move size={10} /> Transform</p>
-            {[['X','0px'],['Y','0px'],['Scale','100%'],['Rotation','0°']].map(([l,v]) => (
-              <div key={l} className="flex items-center gap-2 mb-1.5">
-                <span className="field-label w-14 mb-0">{l}</span>
-                <input defaultValue={v} className="input-dark flex-1" />
+            {[
+              { k: 'X',        suffix: 'px'  },
+              { k: 'Y',        suffix: 'px'  },
+              { k: 'Scale',    suffix: '%'   },
+              { k: 'Rotation', suffix: '°'   },
+            ].map(({ k, suffix }) => (
+              <div key={k} className="flex items-center gap-2 mb-1.5">
+                <span className="field-label w-14 mb-0">{k}</span>
+                <input
+                  value={transform[k]}
+                  onChange={e => setTransform(p => ({ ...p, [k]: e.target.value }))}
+                  className="input-dark flex-1"
+                />
+                <span className="text-[10px] text-zinc-600">{suffix}</span>
               </div>
             ))}
           </section>
+
           <section>
             <p className="panel-label flex items-center gap-1.5"><Palette size={10} /> Color</p>
-            {[['Brightness','100%'],['Contrast','100%'],['Saturation','100%']].map(([l,v]) => (
+            {['Brightness','Contrast','Saturation'].map(l => (
               <div key={l} className="mb-2">
-                <div className="flex justify-between mb-1"><span className="field-label mb-0">{l}</span><span className="text-[10px] text-zinc-400">{v}</span></div>
-                <input type="range" defaultValue={100} min={0} max={200} className="w-full" />
+                <div className="flex justify-between mb-1">
+                  <span className="field-label mb-0">{l}</span>
+                  <span className="text-[10px] text-zinc-400">{color[l]}%</span>
+                </div>
+                <input
+                  type="range" min={0} max={200} value={color[l]}
+                  onChange={e => setColor(p => ({ ...p, [l]: Number(e.target.value) }))}
+                  className="w-full accent-violet-500"
+                />
               </div>
             ))}
           </section>
+
           {(selectedClip.type === 'audio' || selectedClip.type === 'video') && (
             <section>
               <p className="panel-label flex items-center gap-1.5"><Volume2 size={10} /> Audio</p>
               <div className="mb-2">
-                <div className="flex justify-between mb-1"><span className="field-label mb-0">Volume</span><span className="text-[10px] text-zinc-400">100%</span></div>
-                <input type="range" defaultValue={100} min={0} max={150} className="w-full" />
+                <div className="flex justify-between mb-1">
+                  <span className="field-label mb-0">Volume</span>
+                  <span className="text-[10px] text-zinc-400">{volume}%</span>
+                </div>
+                <input
+                  type="range" min={0} max={150} value={volume}
+                  onChange={e => setVolume(Number(e.target.value))}
+                  className="w-full accent-violet-500"
+                />
               </div>
             </section>
           )}

@@ -653,11 +653,13 @@ export default function Dashboard() {
                   <h2 className="text-sm font-semibold text-zinc-300 mb-4">Brand Colors</h2>
                   <div className="flex flex-wrap gap-2 mb-3">
                     {['#7C3AED','#EC4899','#06B6D4','#10B981','#F59E0B','#EF4444'].map(c => (
-                      <div key={c} title={c}
+                      <div key={c} title={`Click to copy ${c}`}
+                        onClick={() => { navigator.clipboard?.writeText(c).catch(()=>{}); toast.add(`Copied ${c}`, 'success') }}
                         className="w-10 h-10 rounded-xl border-2 border-[#2A2A2A] cursor-pointer hover:scale-110 hover:border-white/20 transition-all"
                         style={{ background: c }} />
                     ))}
-                    <div className="w-10 h-10 rounded-xl border-2 border-dashed border-[#2A2A2A] flex items-center justify-center cursor-pointer hover:border-zinc-500 transition-colors">
+                    <div onClick={() => toast.add('Color picker coming soon', 'info')}
+                      className="w-10 h-10 rounded-xl border-2 border-dashed border-[#2A2A2A] flex items-center justify-center cursor-pointer hover:border-zinc-500 transition-colors">
                       <Plus size={14} className="text-zinc-600" />
                     </div>
                   </div>
@@ -672,7 +674,9 @@ export default function Dashboard() {
                       { name: 'Montserrat',  role: 'Heading'   },
                       { name: 'Poppins',     role: 'Subtitle'  },
                     ].map(f => (
-                      <div key={f.name} className="flex items-center justify-between px-3 py-2 rounded-lg bg-[#1A1A1A] border border-[#2A2A2A] cursor-pointer hover:border-[#383838] transition-colors">
+                      <div key={f.name}
+                        onClick={() => toast.add(`Font "${f.name}" set as ${f.role.toLowerCase()}`, 'success')}
+                        className="flex items-center justify-between px-3 py-2 rounded-lg bg-[#1A1A1A] border border-[#2A2A2A] cursor-pointer hover:border-violet-500/50 hover:bg-violet-950/20 transition-all">
                         <span className="text-sm text-zinc-200 font-medium" style={{ fontFamily: f.name }}>{f.name}</span>
                         <span className="text-[11px] text-zinc-600">{f.role}</span>
                       </div>
@@ -683,17 +687,20 @@ export default function Dashboard() {
                 <div className="p-5 rounded-2xl bg-[#111111] border border-[#1A1A1A] sm:col-span-2">
                   <div className="flex items-center justify-between mb-4">
                     <h2 className="text-sm font-semibold text-zinc-300">Logo & Watermark</h2>
-                    <button className="text-xs text-violet-400 hover:text-violet-300 flex items-center gap-1 transition-colors">
+                    <button onClick={() => toast.add('Brand Kit exported as ZIP', 'success')}
+                      className="text-xs text-violet-400 hover:text-violet-300 flex items-center gap-1 transition-colors">
                       <Download size={12} /> Export Brand Kit
                     </button>
                   </div>
                   <div className="grid grid-cols-3 gap-3">
                     {['Primary Logo','Icon Only','Watermark'].map(l => (
-                      <div key={l}
+                      <label key={l}
                         className="border-2 border-dashed border-[#2A2A2A] rounded-xl h-20 flex flex-col items-center justify-center gap-1.5 cursor-pointer hover:border-violet-600/50 transition-colors group">
+                        <input type="file" accept="image/*" className="sr-only"
+                          onChange={() => toast.add(`${l} uploaded`, 'success')} />
                         <Plus size={16} className="text-zinc-700 group-hover:text-violet-500 transition-colors" />
                         <span className="text-[11px] text-zinc-700 group-hover:text-zinc-500 transition-colors">{l}</span>
-                      </div>
+                      </label>
                     ))}
                   </div>
                 </div>

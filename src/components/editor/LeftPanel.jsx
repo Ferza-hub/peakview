@@ -299,9 +299,14 @@ export default function LeftPanel({
               <SLabel>Templates</SLabel>
               <div className="grid grid-cols-2 gap-1.5">
                 {templates.map(t => (
-                  <div key={t.id} className="rounded-lg overflow-hidden border border-[#1F1F1F] hover:border-[#2A2A2A] cursor-pointer transition-all group">
-                    <div className="h-12 flex items-center justify-center" style={{ background: `linear-gradient(135deg, ${t.thumb}33, #111)` }}>
+                  <div key={t.id}
+                    onClick={() => toast.add(`Template "${t.name}" applied`, 'success')}
+                    className="rounded-lg overflow-hidden border border-[#1F1F1F] hover:border-violet-500/50 cursor-pointer transition-all group">
+                    <div className="h-12 flex items-center justify-center relative" style={{ background: `linear-gradient(135deg, ${t.thumb}33, #111)` }}>
                       <div className="w-6 h-6 rounded-md" style={{ background: t.thumb + '60' }} />
+                      <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity">
+                        <span className="text-[9px] text-white font-semibold">Apply</span>
+                      </div>
                     </div>
                     <div className="px-1.5 py-1 bg-[#141414]">
                       <p className="text-[10px] text-zinc-400 truncate">{t.name}</p>
@@ -380,14 +385,17 @@ export default function LeftPanel({
               )}
 
               <SLabel>Font</SLabel>
-              <select className="input-dark mb-2">
+              <select className="input-dark mb-2"
+                onChange={e => toast.add(`Font: ${e.target.value}`, 'info')}>
                 {fontFamilies.map(f => <option key={f}>{f}</option>)}
               </select>
 
               <SLabel>Text Animation</SLabel>
               <div className="flex flex-wrap gap-1">
                 {textAnimations.map(a => (
-                  <button key={a} className="px-2 py-0.5 rounded-full text-[10px] border border-[#2A2A2A] text-zinc-500 hover:text-zinc-300 hover:border-zinc-500 transition-all">{a}</button>
+                  <button key={a}
+                    onClick={() => toast.add(`Animation: ${a}`, 'info')}
+                    className="px-2 py-0.5 rounded-full text-[10px] border border-[#2A2A2A] text-zinc-500 hover:text-violet-300 hover:border-violet-500/60 transition-all">{a}</button>
                 ))}
               </div>
             </>
@@ -567,7 +575,9 @@ export default function LeftPanel({
               <SLabel>Version History</SLabel>
               <div className="flex flex-col gap-1">
                 {(verHist||[]).map(v => (
-                  <div key={v.id} className="flex items-center gap-2 px-2 py-1.5 rounded-lg bg-[#141414] border border-[#1F1F1F] cursor-pointer hover:border-[#2A2A2A] transition-all">
+                  <div key={v.id}
+                    onClick={() => toast.add(`Restored: ${v.label}`, 'success')}
+                    className="flex items-center gap-2 px-2 py-1.5 rounded-lg bg-[#141414] border border-[#1F1F1F] cursor-pointer hover:border-violet-500/50 hover:bg-violet-950/20 transition-all">
                     <div className="w-1.5 h-1.5 rounded-full bg-violet-400 shrink-0" />
                     <div className="flex-1 min-w-0">
                       <p className="text-[11px] text-zinc-300 truncate">{v.label}</p>
