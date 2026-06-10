@@ -23,6 +23,6 @@ export const upsertProjectMeta = (id, patch) => {
   const ts = new Date().toISOString()
   const updated = exists
     ? list.map(p => p.id === id ? { ...p, ...patch, updatedAt: ts } : p)
-    : [...list, { id, ...patch, createdAt: ts, updatedAt: ts }]
+    : [{ id, ...patch, createdAt: ts, updatedAt: ts }, ...list]
   saveProjects(updated)
 }

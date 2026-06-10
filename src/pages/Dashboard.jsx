@@ -182,7 +182,7 @@ export default function Dashboard() {
       demos.forEach(p => saveProjectData(p.id, { tracks: initialTracks, mediaFiles: defaultMedia, format: '16:9' }))
       list = demos
     }
-    setProjects(list)
+    setProjects([...list].sort((a, b) => new Date(b.createdAt || 0) - new Date(a.createdAt || 0)))
   }, [])
 
   useEffect(() => { if (renamingId && renameRef.current) renameRef.current.focus() }, [renamingId])
