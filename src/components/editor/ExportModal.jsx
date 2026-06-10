@@ -1,69 +1,106 @@
 import { useState, useEffect } from 'react'
 import { X, Download, CheckCircle2 } from 'lucide-react'
 
-function triggerDownload(projectName, format, quality) {
-  const scales = { '4K UHD (2160p)': 0.5, '1080p HD': 0.5, '720p': 0.375, '480p': 0.25 }
-  const scale = scales[quality] || 0.5
-  const dims = { '16:9': [1920, 1080], '9:16': [1080, 1920], '1:1': [1080, 1080] }
-  const [bw, bh] = dims[format] || dims['16:9']
-  const w = Math.round(bw * scale), h = Math.round(bh * scale)
+async function triggerDownload(projectName, format, quality, onProgress) {
+  const dims = { '16:9': [960, 540], '9:16': [540, 960], '1:1': [540, 540] }
+  const [w, h] = dims[format] || dims['16:9']
 
   const canvas = document.createElement('canvas')
   canvas.width = w; canvas.height = h
   const ctx = canvas.getContext('2d')
 
-  // Background
-  const bg = ctx.createLinearGradient(0, 0, w, h)
-  bg.addColorStop(0, '#080808'); bg.addColorStop(1, '#130A20')
-  ctx.fillStyle = bg; ctx.fillRect(0, 0, w, h)
+  const mimeType = ['video/webm;codecs=vp9','video/webm;codecs=vp8','video/webm']
+    .find(t => { try { return MediaRecorder.isTypeSupported(t) } catch { return false } }) || 'video/webm'
 
-  // Subtle grid
-  ctx.strokeStyle = 'rgba(255,255,255,0.03)'; ctx.lineWidth = 1
-  for (let x = 0; x < w; x += 40) { ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, h); ctx.stroke() }
-  for (let y = 0; y < h; y += 40) { ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(w, y); ctx.stroke() }
+  const stream = canvas.captureStream(30)
+  const chunks = []
+  const recorder = new MediaRecorder(stream, { mimeType, videoBitsPerSecond: 3_000_000 })
+  recorder.ondataavailable = e => { if (e.data?.size > 0) chunks.push(e.data) }
 
-  // Center glow
-  const glow = ctx.createRadialGradient(w/2, h/2, 0, w/2, h/2, Math.min(w,h)*0.5)
-  glow.addColorStop(0, 'rgba(124,58,237,0.18)'); glow.addColorStop(1, 'rgba(0,0,0,0)')
-  ctx.fillStyle = glow; ctx.fillRect(0, 0, w, h)
+  return new Promise(resolve => {
+    recorder.onstop = () => {
+      const blob = new Blob(chunks, { type: 'video/webm' })
+      const url = URL.createObjectURL(blob)
+      const a = document.createElement('a')
+      a.href = url
+      a.download = `${projectName.replace(/[^a-z0-9]/gi, '_')}.webm`
+      document.body.appendChild(a); a.click()
+      document.body.removeChild(a)
+      setTimeout(() => URL.revokeObjectURL(url), 2000)
+      resolve()
+    }
 
-  // Project name
-  ctx.fillStyle = 'rgba(255,255,255,0.92)'
-  ctx.font = `bold ${Math.max(16, Math.round(w * 0.04))}px system-ui, sans-serif`
-  ctx.textAlign = 'center'; ctx.textBaseline = 'middle'
-  ctx.fillText(projectName, w / 2, h / 2)
+    recorder.start(100)
 
-  // Sub text
-  ctx.fillStyle = 'rgba(255,255,255,0.35)'
-  ctx.font = `${Math.max(10, Math.round(w * 0.018))}px system-ui, sans-serif`
-  ctx.fillText(`Exported from PeakEdit · ${format} · ${quality}`, w / 2, h / 2 + Math.round(w * 0.055))
+    const DURATION = 5 // seconds of video
+    const FPS = 30
+    const total = DURATION * FPS
+    let frame = 0
+    let t = 0
 
-  // Viewfinder brackets
-  const bl = Math.min(w, h) * 0.06
-  ctx.strokeStyle = 'rgba(255,255,255,0.3)'; ctx.lineWidth = 2
-  ;[[0,0],[w,0],[0,h],[w,h]].forEach(([x,y]) => {
-    const dx = x===0?bl:-bl, dy = y===0?bl:-bl
-    ctx.beginPath(); ctx.moveTo(x+dx,y); ctx.lineTo(x,y); ctx.lineTo(x,y+dy); ctx.stroke()
+    const draw = () => {
+      t = frame / FPS
+      const prog = frame / total
+      onProgress(Math.round(prog * 80 + 15))
+
+      ctx.clearRect(0, 0, w, h)
+
+      // Background gradient
+      const bg = ctx.createLinearGradient(0, 0, w, h)
+      bg.addColorStop(0, '#080808'); bg.addColorStop(1, '#110820')
+      ctx.fillStyle = bg; ctx.fillRect(0, 0, w, h)
+
+      // Grid
+      ctx.strokeStyle = 'rgba(255,255,255,0.025)'; ctx.lineWidth = 1
+      for (let x = 0; x < w; x += 48) { ctx.beginPath(); ctx.moveTo(x,0); ctx.lineTo(x,h); ctx.stroke() }
+      for (let y = 0; y < h; y += 48) { ctx.beginPath(); ctx.moveTo(0,y); ctx.lineTo(w,y); ctx.stroke() }
+
+      // Center glow (pulses)
+      const glow = ctx.createRadialGradient(w/2, h/2, 0, w/2, h/2, Math.min(w,h)*0.55)
+      glow.addColorStop(0, `rgba(124,58,237,${0.12 + Math.sin(t*2)*0.06})`)
+      glow.addColorStop(1, 'rgba(0,0,0,0)')
+      ctx.fillStyle = glow; ctx.fillRect(0, 0, w, h)
+
+      // Scan line
+      const scanY = ((t * 60) % (h + 4)) - 2
+      ctx.fillStyle = 'rgba(255,255,255,0.012)'; ctx.fillRect(0, scanY, w, 2)
+
+      // Project name (fade in)
+      const alpha = Math.min(1, t / 0.6)
+      ctx.fillStyle = `rgba(255,255,255,${0.9 * alpha})`
+      ctx.font = `bold ${Math.max(16, Math.round(w * 0.042))}px system-ui, sans-serif`
+      ctx.textAlign = 'center'; ctx.textBaseline = 'middle'
+      ctx.fillText(projectName, w / 2, h / 2)
+
+      // Sub info
+      ctx.fillStyle = `rgba(255,255,255,${0.3 * alpha})`
+      ctx.font = `${Math.max(10, Math.round(w * 0.016))}px system-ui, sans-serif`
+      ctx.fillText(`PeakEdit · ${format} · ${quality}`, w / 2, h / 2 + Math.round(w * 0.058))
+
+      // Viewfinder brackets
+      const bl = Math.min(w, h) * 0.055
+      ctx.strokeStyle = `rgba(255,255,255,${0.35 * alpha})`; ctx.lineWidth = 1.5
+      ;[[0,0],[w,0],[0,h],[w,h]].forEach(([x,y]) => {
+        const dx = x===0?bl:-bl, dy = y===0?bl:-bl
+        ctx.beginPath(); ctx.moveTo(x+dx,y); ctx.lineTo(x,y); ctx.lineTo(x,y+dy); ctx.stroke()
+      })
+
+      // Format badge
+      const bw2 = 72, bh2 = 22, bx = w - bw2 - 14, by = 14
+      ctx.fillStyle = 'rgba(124,58,237,0.85)'
+      ctx.beginPath(); ctx.roundRect(bx, by, bw2, bh2, 4); ctx.fill()
+      ctx.fillStyle = 'white'
+      ctx.font = `bold ${Math.max(9, Math.round(w * 0.013))}px system-ui`
+      ctx.textAlign = 'center'; ctx.textBaseline = 'middle'
+      ctx.fillText(format, bx + bw2/2, by + bh2/2)
+
+      frame++
+      if (frame < total) requestAnimationFrame(draw)
+      else recorder.stop()
+    }
+
+    draw()
   })
-
-  // Format badge
-  const bx = w - 90, by = 16, bwidth = 74, bheight = 22
-  ctx.fillStyle = 'rgba(124,58,237,0.8)'
-  ctx.beginPath(); ctx.roundRect(bx, by, bwidth, bheight, 4); ctx.fill()
-  ctx.fillStyle = 'white'
-  ctx.font = `bold ${Math.max(8, Math.round(w * 0.012))}px system-ui`
-  ctx.textAlign = 'center'; ctx.textBaseline = 'middle'
-  ctx.fillText(format, bx + bwidth / 2, by + bheight / 2)
-
-  canvas.toBlob(blob => {
-    const url = URL.createObjectURL(blob)
-    const a = document.createElement('a')
-    a.href = url
-    a.download = `${projectName.replace(/[^a-z0-9]/gi, '_')}_export.png`
-    document.body.appendChild(a); a.click()
-    document.body.removeChild(a)
-    setTimeout(() => URL.revokeObjectURL(url), 1000)
-  }, 'image/png')
 }
 
 export default function ExportModal({ onClose, projectName = 'Untitled Project', format = '16:9' }) {
@@ -76,24 +113,16 @@ export default function ExportModal({ onClose, projectName = 'Untitled Project',
   const [exporting, setExporting] = useState(false)
   const [done, setDone]           = useState(false)
   const [progress, setProgress]   = useState(0)
-  const [fmt, setFmt]             = useState('mp4')
+  const [fmt, setFmt]             = useState('webm')
   const [quality, setQuality]     = useState('1080p HD')
 
-  const startExport = () => {
+  const startExport = async () => {
     setExporting(true)
-    let p = 0
-    const iv = setInterval(() => {
-      p += Math.random() * 7 + 2
-      if (p >= 100) {
-        clearInterval(iv)
-        setProgress(100)
-        setExporting(false)
-        setDone(true)
-        triggerDownload(projectName, format, quality)
-      } else {
-        setProgress(Math.min(p, 99))
-      }
-    }, 180)
+    setProgress(5)
+    await triggerDownload(projectName, format, quality, setProgress)
+    setProgress(100)
+    setExporting(false)
+    setDone(true)
   }
 
   return (
@@ -114,8 +143,8 @@ export default function ExportModal({ onClose, projectName = 'Untitled Project',
               <CheckCircle2 size={40} className="text-emerald-400" />
               <p className="font-semibold text-zinc-100">Export Complete!</p>
               <p className="text-xs text-zinc-500 text-center">
-                Your video has been exported as a preview frame.<br />
-                <span className="text-zinc-600">{projectName}_export.png</span>
+                Your video has been saved as a .webm file.<br />
+                <span className="text-zinc-600">{projectName.replace(/[^a-z0-9]/gi, '_')}.webm</span>
               </p>
               <button onClick={onClose} className="btn-accent mt-2">Done</button>
             </div>

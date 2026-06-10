@@ -8,6 +8,7 @@ import {
 import { getProjects, saveProjects, upsertProjectMeta, deleteProjectData, saveProjectData, setLastId, getProjectData } from '../utils/storage'
 import { genId } from '../utils/helpers'
 import { useToast } from '../context/ToastContext'
+import { useAuth } from '../context/AuthContext'
 import ConfirmDialog from '../components/ui/ConfirmDialog'
 import { initialTracks, mediaFiles as defaultMedia, templates, stockFootage, stockMusic } from '../data/editorData'
 
@@ -157,6 +158,7 @@ function seed() {
 export default function Dashboard() {
   const navigate = useNavigate()
   const toast    = useToast()
+  const { user, logout } = useAuth()
 
   const [projects, setProjects]     = useState([])
   const [search, setSearch]         = useState('')
@@ -314,7 +316,21 @@ export default function Dashboard() {
               placeholder="Search projects…"
               className="bg-[#1A1A1A] border border-[#2A2A2A] rounded-lg pl-8 pr-3 py-1.5 text-sm text-zinc-200 placeholder-zinc-600 focus:outline-none focus:border-violet-500/60 w-48 transition-colors" />
           </div>
-          <div className="w-8 h-8 rounded-full bg-gradient-to-br from-violet-500 to-pink-500 flex items-center justify-center text-white text-sm font-bold cursor-pointer select-none">A</div>
+          <div className="relative group">
+            <div className="w-8 h-8 rounded-full bg-gradient-to-br from-violet-500 to-pink-500 flex items-center justify-center text-white text-sm font-bold cursor-pointer select-none">
+              {user?.avatar || 'U'}
+            </div>
+            <div className="absolute right-0 top-10 bg-[#1A1A1A] border border-[#2A2A2A] rounded-xl shadow-2xl z-50 overflow-hidden min-w-[180px] opacity-0 group-hover:opacity-100 pointer-events-none group-hover:pointer-events-auto transition-opacity">
+              <div className="px-3 py-2.5 border-b border-[#252525]">
+                <p className="text-xs font-semibold text-zinc-200">{user?.name}</p>
+                <p className="text-[10px] text-zinc-500">{user?.email}</p>
+                <span className="text-[9px] bg-violet-900/60 text-violet-300 px-1.5 py-0.5 rounded-full mt-1 inline-block">{user?.plan}</span>
+              </div>
+              <button onClick={logout} className="flex items-center gap-2 w-full px-3 py-2 text-xs text-red-400 hover:bg-red-950/40 transition-colors">
+                Sign out
+              </button>
+            </div>
+          </div>
         </div>
       </header>
 

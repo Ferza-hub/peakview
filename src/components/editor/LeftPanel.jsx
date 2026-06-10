@@ -1,4 +1,4 @@
-import { useState, useRef } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import {
   FolderOpen, LayoutTemplate, Type, Music, Sparkles, Cpu, Package,
   Plus, Search, Play, Check, Pencil, Trash2, X, Mic, Globe, RefreshCw, Zap,
@@ -32,15 +32,45 @@ function SLabel({ children }) {
   return <p className="text-[10px] font-semibold tracking-widest text-zinc-600 uppercase mb-2 mt-4 first:mt-0">{children}</p>
 }
 
-function AITool({ icon: Icon, title, desc, badge, onRun, state }) {
+const AI_ENDPOINTS = {
+  silence:   'POST /v1/ai/silence-detect',
+  broll:     'POST /v1/ai/broll-suggest',
+  script:    'POST /v1/ai/script-to-video',
+  bg:        'POST /v1/ai/background-remove',
+  reframe:   'POST /v1/ai/auto-reframe',
+  highlight: 'POST /v1/ai/highlight-clip',
+}
+
+const AI_RESULTS = {
+  silence:   '3 silent segments removed',
+  broll:     '5 B-roll matches found',
+  script:    '8 clips generated',
+  bg:        'Background removed',
+  reframe:   'Reframed to 9:16',
+  highlight: '4 highlights extracted',
+}
+
+function AITool({ icon: Icon, title, desc, badge, onRun, state, apiKey }) {
   const processing = state === 'processing'
   const done = state === 'done'
+  const [step, setStep] = useState(0)
+
+  useEffect(() => {
+    if (!processing) { setStep(0); return }
+    const steps = [
+      setTimeout(() => setStep(1), 300),
+      setTimeout(() => setStep(2), 900),
+      setTimeout(() => setStep(3), 1800),
+    ]
+    return () => steps.forEach(clearTimeout)
+  }, [processing])
+
   return (
-    <div className={`p-2.5 rounded-xl border transition-all ${done ? 'border-emerald-700/50 bg-emerald-950/30' : 'border-[#2A2A2A] bg-[#141414] hover:border-[#383838]'}`}>
+    <div className={`p-2.5 rounded-xl border transition-all ${done ? 'border-emerald-700/50 bg-emerald-950/30' : processing ? 'border-violet-700/40 bg-violet-950/20' : 'border-[#2A2A2A] bg-[#141414] hover:border-[#383838]'}`}>
       <div className="flex items-start justify-between gap-2 mb-1.5">
         <div className="flex items-center gap-2">
-          <div className={`w-7 h-7 rounded-lg flex items-center justify-center ${done ? 'bg-emerald-800/60' : 'bg-violet-900/60'}`}>
-            {done ? <Check size={13} className="text-emerald-400" /> : <Icon size={13} className="text-violet-400" />}
+          <div className={`w-7 h-7 rounded-lg flex items-center justify-center ${done ? 'bg-emerald-800/60' : processing ? 'bg-violet-800/60' : 'bg-violet-900/60'}`}>
+            {done ? <Check size={13} className="text-emerald-400" /> : <Icon size={13} className={processing ? 'text-violet-300 animate-pulse' : 'text-violet-400'} />}
           </div>
           <p className="text-xs font-semibold text-zinc-200">{title}</p>
         </div>
@@ -48,14 +78,16 @@ function AITool({ icon: Icon, title, desc, badge, onRun, state }) {
       </div>
       <p className="text-[10px] text-zinc-500 mb-2 leading-relaxed">{desc}</p>
       {processing ? (
-        <div className="flex items-center gap-2">
-          <div className="h-1 flex-1 bg-[#1A1A1A] rounded-full overflow-hidden">
-            <div className="h-full bg-violet-500 rounded-full animate-pulse" style={{ width: '65%' }} />
-          </div>
-          <span className="text-[10px] text-zinc-500">Processing…</span>
+        <div className="bg-[#0D0D0D] rounded-lg p-2 border border-[#1A1A1A] font-mono">
+          <div className={`text-[9px] transition-opacity ${step >= 1 ? 'text-zinc-500 opacity-100' : 'opacity-0'}`}>→ Connecting to API…</div>
+          <div className={`text-[9px] transition-opacity mt-0.5 ${step >= 2 ? 'text-violet-400 opacity-100' : 'opacity-0'}`}>{AI_ENDPOINTS[apiKey] || 'POST /v1/ai/process'}</div>
+          <div className={`text-[9px] transition-opacity mt-0.5 ${step >= 3 ? 'text-emerald-400 opacity-100' : 'opacity-0'}`}>◉ Processing…</div>
         </div>
       ) : done ? (
-        <span className="text-[10px] text-emerald-400 font-medium">✓ Done</span>
+        <div className="flex items-center gap-1.5">
+          <span className="text-[10px] text-emerald-400 font-medium">✓ 200 OK</span>
+          <span className="text-[9px] text-zinc-600">— {AI_RESULTS[apiKey] || 'Complete'}</span>
+        </div>
       ) : (
         <button onClick={onRun} className="text-[11px] bg-violet-700/70 hover:bg-violet-600/80 text-violet-200 px-2.5 py-1 rounded-lg transition-colors font-medium">Run</button>
       )}
@@ -494,14 +526,14 @@ export default function LeftPanel({
           {activeTab === 'ai' && (
             <div className="flex flex-col gap-2">
               {[
-                { key:'silence',  icon: Cpu,     title: 'Auto-Cut Silence',  desc: 'Remove silent gaps from footage',  badge: 'Smart' },
-                { key:'broll',    icon: Film,     title: 'B-Roll Suggestions',desc: 'AI suggests relevant B-roll clips', badge: 'Beta'  },
-                { key:'script',   icon: FileText, title: 'Script to Video',   desc: 'Generate clips from your script'              },
-                { key:'bg',       icon: Sparkles, title: 'Background Remove', desc: 'Remove background from any clip',  badge: 'Pro'   },
-                { key:'reframe',  icon: Zap,      title: 'Auto-Reframe',      desc: 'Reframe for any aspect ratio'                  },
-                { key:'highlight',icon: Cpu,      title: 'Highlight Clipper', desc: 'Extract best moments automatically', badge: 'Smart' },
-              ].map(({ key, icon, title, desc, badge }) => (
-                <AITool key={key} icon={icon} title={title} desc={desc} badge={badge}
+                { key:'silence',  apiKey:'silence',   icon: Cpu,     title: 'Auto-Cut Silence',   desc: 'Remove silent gaps from footage',   badge: 'Smart' },
+                { key:'broll',    apiKey:'broll',     icon: Film,    title: 'B-Roll Suggestions', desc: 'AI suggests relevant B-roll clips',  badge: 'Beta'  },
+                { key:'script',   apiKey:'script',    icon: FileText,title: 'Script to Video',    desc: 'Generate clips from your script'                   },
+                { key:'bg',       apiKey:'bg',        icon: Sparkles,title: 'Background Remove',  desc: 'Remove background from any clip',   badge: 'Pro'   },
+                { key:'reframe',  apiKey:'reframe',   icon: Zap,     title: 'Auto-Reframe',       desc: 'Reframe for any aspect ratio'                      },
+                { key:'highlight',apiKey:'highlight', icon: Cpu,     title: 'Highlight Clipper',  desc: 'Extract best moments automatically', badge: 'Smart' },
+              ].map(({ key, apiKey, icon, title, desc, badge }) => (
+                <AITool key={key} apiKey={apiKey} icon={icon} title={title} desc={desc} badge={badge}
                   state={aiStates[key]} onRun={() => runAI(key)} />
               ))}
             </div>

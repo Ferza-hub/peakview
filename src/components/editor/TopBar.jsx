@@ -1,13 +1,15 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { Zap, ChevronLeft, Undo2, Redo2, Save, Download, Share2, Users, Clock, Monitor, Smartphone, Square, Check, Loader2 } from 'lucide-react'
+import { Zap, ChevronLeft, Undo2, Redo2, Save, Download, Share2, Cloud, Clock, Monitor, Smartphone, Square, Check, Loader2 } from 'lucide-react'
+import { useAuth } from '../../context/AuthContext'
 
 const FORMAT_ICONS = { '16:9': Monitor, '9:16': Smartphone, '1:1': Square }
 
-export default function TopBar({ projectName, setProjectName, canUndo, canRedo, onUndo, onRedo, format, setFormat, onExport, onPublish, collaborators, onShowCollab, saveStatus, onSave }) {
+export default function TopBar({ projectName, setProjectName, canUndo, canRedo, onUndo, onRedo, format, setFormat, onExport, onPublish, saveStatus, onSave }) {
   const navigate = useNavigate()
+  const { user, logout } = useAuth()
 
-  const saveLabel = saveStatus === 'saving' ? 'Saving…' : saveStatus === 'saved' ? 'Saved' : 'Save'
+  const saveLabel = saveStatus === 'saving' ? 'Syncing…' : saveStatus === 'saved' ? 'Synced' : 'Save'
   const SaveIcon  = saveStatus === 'saving' ? Loader2 : saveStatus === 'saved' ? Check : Save
 
   return (
@@ -43,23 +45,16 @@ export default function TopBar({ projectName, setProjectName, canUndo, canRedo, 
 
       <div className="w-px h-5 bg-[#2A2A2A] mx-1" />
 
-      <div className={`flex items-center gap-1.5 text-xs ${saveStatus === 'unsaved' ? 'text-amber-400' : 'text-zinc-500'}`}>
-        <Clock size={11} />
-        <span>{saveStatus === 'unsaved' ? 'Unsaved' : saveStatus === 'saving' ? 'Saving…' : 'Auto-saved'}</span>
+      <div className={`flex items-center gap-1.5 text-xs ${saveStatus === 'unsaved' ? 'text-amber-400' : saveStatus === 'saving' ? 'text-violet-400' : 'text-emerald-500'}`}>
+        {saveStatus === 'saving'
+          ? <><span className="w-2.5 h-2.5 border border-violet-400 border-t-transparent rounded-full animate-spin" /> <span>Syncing…</span></>
+          : saveStatus === 'saved'
+          ? <><Cloud size={11} /> <span>Synced</span></>
+          : <><Clock size={11} /> <span>Unsaved</span></>
+        }
       </div>
 
       <div className="ml-auto flex items-center gap-2">
-        <button onClick={onShowCollab} className="flex items-center gap-2 px-2.5 py-1.5 rounded-lg hover:bg-[#1A1A1A] transition-colors">
-          <div className="flex -space-x-1.5">
-            {(collaborators || []).filter(c => c.online).map(c => (
-              <div key={c.id} title={c.name} className="w-6 h-6 rounded-full border-2 border-[#111] flex items-center justify-center text-xs font-bold text-white" style={{ backgroundColor: c.color }}>
-                {c.name[0]}
-              </div>
-            ))}
-          </div>
-          <span className="text-xs text-zinc-400">{(collaborators || []).filter(c => c.online).length} online</span>
-        </button>
-
         <button onClick={onSave} className={`btn-surface ${saveStatus === 'saved' ? 'text-emerald-400 border-emerald-600/40' : ''}`}>
           <SaveIcon size={13} className={saveStatus === 'saving' ? 'animate-spin' : ''} />
           {saveLabel}
@@ -67,6 +62,22 @@ export default function TopBar({ projectName, setProjectName, canUndo, canRedo, 
 
         <button onClick={onExport} className="btn-surface"><Download size={13} /> Export</button>
         <button onClick={onPublish} className="btn-accent"><Share2 size={13} /> Publish</button>
+
+        <div className="relative group ml-1">
+          <div className="w-7 h-7 rounded-full bg-gradient-to-br from-violet-500 to-pink-500 flex items-center justify-center text-white text-xs font-bold cursor-pointer select-none"
+            title={user?.email}>
+            {user?.avatar || 'U'}
+          </div>
+          <div className="absolute right-0 top-9 bg-[#1A1A1A] border border-[#2A2A2A] rounded-xl shadow-2xl z-50 overflow-hidden min-w-[160px] opacity-0 group-hover:opacity-100 pointer-events-none group-hover:pointer-events-auto transition-opacity">
+            <div className="px-3 py-2.5 border-b border-[#252525]">
+              <p className="text-xs font-semibold text-zinc-200 truncate">{user?.name}</p>
+              <p className="text-[10px] text-zinc-500 truncate">{user?.email}</p>
+            </div>
+            <button onClick={logout} className="flex items-center gap-2 w-full px-3 py-2 text-xs text-red-400 hover:bg-red-950/40 transition-colors">
+              Sign out
+            </button>
+          </div>
+        </div>
       </div>
     </div>
   )
