@@ -6,7 +6,7 @@ import {
 } from 'lucide-react'
 import {
   stockMusic, stockFootage, templates, transitions, colorPresets,
-  textAnimations, fontFamilies, subtitleLanguages, collaborators as DEMO_COLLABS, comments as DEMO_COMMENTS, versionHistory
+  textAnimations, fontFamilies, subtitleLanguages, versionHistory
 } from '../../data/editorData'
 import AddMediaModal from './AddMediaModal'
 import ConfirmDialog from '../ui/ConfirmDialog'
@@ -67,7 +67,7 @@ export default function LeftPanel({
   activeTab, setActiveTab,
   mediaFiles, onAddMedia, onUpdateMedia, onDeleteMedia, onAddToTimeline,
   captions, onAddCaption, onUpdateCaption, onDeleteCaption, onGenerateCaptions,
-  comments, collaborators, versionHistory: verHist,
+  versionHistory: verHist,
   onEffectChange,    // called with { type: 'color', filter: cssString, presetId }
   onTransitionSelect, // called with transition id string
 }) {

@@ -8,7 +8,7 @@ import RightPanel from '../components/editor/RightPanel'
 import ExportModal from '../components/editor/ExportModal'
 import PublishModal from '../components/editor/PublishModal'
 import ConfirmDialog from '../components/ui/ConfirmDialog'
-import { initialTracks, mediaFiles as defaultMedia, collaborators, comments, versionHistory, TOTAL_DURATION } from '../data/editorData'
+import { initialTracks, mediaFiles as defaultMedia, versionHistory, TOTAL_DURATION } from '../data/editorData'
 import { getProjectData, saveProjectData, upsertProjectMeta, getProjects } from '../utils/storage'
 import { genId, deepClone, parseDur } from '../utils/helpers'
 import { useToast } from '../context/ToastContext'
@@ -281,8 +281,6 @@ export default function Editor() {
         format={format} setFormat={setFormat}
         onExport={() => setShowExport(true)}
         onPublish={() => setShowPublish(true)}
-        collaborators={collaborators}
-        onShowCollab={() => setActiveTab('collab')}
         saveStatus={saveStatus}
         onSave={() => { persist(tracks, mediaFiles, format, projectName); toast.add('Saved', 'success') }}
       />
@@ -296,7 +294,7 @@ export default function Editor() {
           onAddCaption={addCaption} onUpdateCaption={updateCaption}
           onDeleteCaption={deleteCaption} onGenerateCaptions={generateCaptions}
           onAddToTimeline={addMediaToTimeline}
-          comments={comments} collaborators={collaborators} versionHistory={versionHistory}
+          versionHistory={versionHistory}
           onEffectChange={({ filter }) => setColorFilter(filter)}
           onTransitionSelect={setActiveTransition}
         />
