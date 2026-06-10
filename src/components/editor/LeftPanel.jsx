@@ -50,10 +50,19 @@ const AI_RESULTS = {
   highlight: '4 highlights extracted',
 }
 
+const AI_ERRORS = [
+  '503 Service Unavailable',
+  'Connection timeout',
+  'Rate limit exceeded',
+  '500 Internal Server Error',
+]
+
 function AITool({ icon: Icon, title, desc, badge, onRun, state, apiKey }) {
   const processing = state === 'processing'
   const done = state === 'done'
+  const isError = state === 'error'
   const [step, setStep] = useState(0)
+  const [errorMsg, setErrorMsg] = useState('')
 
   useEffect(() => {
     if (!processing) { setStep(0); return }
@@ -65,12 +74,19 @@ function AITool({ icon: Icon, title, desc, badge, onRun, state, apiKey }) {
     return () => steps.forEach(clearTimeout)
   }, [processing])
 
+  useEffect(() => {
+    if (isError && !errorMsg) {
+      setErrorMsg(AI_ERRORS[Math.floor(Math.random() * AI_ERRORS.length)])
+    }
+    if (!isError) setErrorMsg('')
+  }, [isError])
+
   return (
-    <div className={`p-2.5 rounded-xl border transition-all ${done ? 'border-emerald-700/50 bg-emerald-950/30' : processing ? 'border-violet-700/40 bg-violet-950/20' : 'border-[#2A2A2A] bg-[#141414] hover:border-[#383838]'}`}>
+    <div className={`p-2.5 rounded-xl border transition-all ${done ? 'border-emerald-700/50 bg-emerald-950/30' : processing ? 'border-violet-700/40 bg-violet-950/20' : isError ? 'border-red-800/50 bg-red-950/20' : 'border-[#2A2A2A] bg-[#141414] hover:border-[#383838]'}`}>
       <div className="flex items-start justify-between gap-2 mb-1.5">
         <div className="flex items-center gap-2">
-          <div className={`w-7 h-7 rounded-lg flex items-center justify-center ${done ? 'bg-emerald-800/60' : processing ? 'bg-violet-800/60' : 'bg-violet-900/60'}`}>
-            {done ? <Check size={13} className="text-emerald-400" /> : <Icon size={13} className={processing ? 'text-violet-300 animate-pulse' : 'text-violet-400'} />}
+          <div className={`w-7 h-7 rounded-lg flex items-center justify-center ${done ? 'bg-emerald-800/60' : processing ? 'bg-violet-800/60' : isError ? 'bg-red-900/60' : 'bg-violet-900/60'}`}>
+            {done ? <Check size={13} className="text-emerald-400" /> : isError ? <X size={13} className="text-red-400" /> : <Icon size={13} className={processing ? 'text-violet-300 animate-pulse' : 'text-violet-400'} />}
           </div>
           <p className="text-xs font-semibold text-zinc-200">{title}</p>
         </div>
@@ -87,6 +103,15 @@ function AITool({ icon: Icon, title, desc, badge, onRun, state, apiKey }) {
         <div className="flex items-center gap-1.5">
           <span className="text-[10px] text-emerald-400 font-medium">✓ 200 OK</span>
           <span className="text-[9px] text-zinc-600">— {AI_RESULTS[apiKey] || 'Complete'}</span>
+        </div>
+      ) : isError ? (
+        <div className="flex items-center justify-between gap-2">
+          <div className="bg-[#0D0D0D] rounded-lg px-2 py-1.5 border border-red-900/40 font-mono flex-1">
+            <div className="text-[9px] text-red-400">✗ {errorMsg}</div>
+          </div>
+          <button onClick={onRun} className="text-[10px] bg-[#1A1A1A] hover:bg-violet-900/40 border border-[#2A2A2A] hover:border-violet-700/50 text-zinc-400 hover:text-violet-300 px-2 py-1.5 rounded-lg transition-colors font-medium flex items-center gap-1 shrink-0">
+            <RefreshCw size={10} /> Retry
+          </button>
         </div>
       ) : (
         <button onClick={onRun} className="text-[11px] bg-violet-700/70 hover:bg-violet-600/80 text-violet-200 px-2.5 py-1 rounded-lg transition-colors font-medium">Run</button>
@@ -185,7 +210,12 @@ export default function LeftPanel({
 
   const runAI = (key) => {
     setAiStates(p => ({ ...p, [key]: 'processing' }))
-    setTimeout(() => setAiStates(p => ({ ...p, [key]: 'done' })), 2800)
+    setTimeout(() => {
+      // 15% chance of simulated error on first run; retry always succeeds
+      const prev = aiStates[key]
+      const fail = prev !== 'error' && Math.random() < 0.15
+      setAiStates(p => ({ ...p, [key]: fail ? 'error' : 'done' }))
+    }, 2800)
   }
 
   const filteredMedia = (mediaFiles || []).filter(m => m.name.toLowerCase().includes(search.toLowerCase()))

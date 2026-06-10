@@ -26,25 +26,38 @@ export default function PublishModal({ onClose }) {
   const [done, setDone]             = useState(false)
   const [liveUrl, setLiveUrl]       = useState('')
   const [copied, setCopied]         = useState(false)
+  const [error, setError]           = useState('')
 
   const publish = () => {
     if (!title.trim()) return
     setPublishing(true)
     setProgress(0)
+    setError('')
     let p = 0
-    const iv = setInterval(() => {
-      p += Math.random() * 12 + 4
-      if (p >= 100) {
-        clearInterval(iv)
-        setProgress(100)
-        setPublishing(false)
-        const pl = PLATFORMS.find(x => x.id === platform)
-        setLiveUrl(pl.urlBase + genId())
-        setDone(true)
-      } else {
-        setProgress(Math.min(p, 99))
-      }
-    }, 150)
+    try {
+      const iv = setInterval(() => {
+        try {
+          p += Math.random() * 12 + 4
+          if (p >= 100) {
+            clearInterval(iv)
+            setProgress(100)
+            setPublishing(false)
+            const pl = PLATFORMS.find(x => x.id === platform)
+            setLiveUrl(pl.urlBase + genId())
+            setDone(true)
+          } else {
+            setProgress(Math.min(p, 99))
+          }
+        } catch (e) {
+          clearInterval(iv)
+          setPublishing(false)
+          setError('Upload failed. Check your connection and try again.')
+        }
+      }, 150)
+    } catch (e) {
+      setPublishing(false)
+      setError('Could not connect to publishing service. Please try again.')
+    }
   }
 
   const copyUrl = useCallback(() => {
@@ -128,10 +141,19 @@ export default function PublishModal({ onClose }) {
                   </p>
                 </div>
               )}
+              {error && (
+                <div className="bg-red-950/40 border border-red-800/50 rounded-xl p-3 flex items-start gap-2.5">
+                  <span className="text-red-400 text-sm mt-0.5 shrink-0">✕</span>
+                  <div className="flex-1">
+                    <p className="text-xs text-red-300 font-medium mb-0.5">Publish Failed</p>
+                    <p className="text-[10px] text-red-400/80 leading-relaxed">{error}</p>
+                  </div>
+                </div>
+              )}
               <div className="flex gap-2 justify-end">
                 <button onClick={onClose} className="btn-ghost">Cancel</button>
                 <button onClick={publish} disabled={!title.trim() || publishing} className="btn-accent">
-                  <Share2 size={13} /> {publishing ? 'Publishing…' : 'Publish'}
+                  <Share2 size={13} /> {publishing ? 'Publishing…' : error ? 'Retry' : 'Publish'}
                 </button>
               </div>
             </>

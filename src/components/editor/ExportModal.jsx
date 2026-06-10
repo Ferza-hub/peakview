@@ -115,14 +115,28 @@ export default function ExportModal({ onClose, projectName = 'Untitled Project',
   const [progress, setProgress]   = useState(0)
   const [fmt, setFmt]             = useState('webm')
   const [quality, setQuality]     = useState('1080p HD')
+  const [error, setError]         = useState('')
 
   const startExport = async () => {
     setExporting(true)
     setProgress(5)
-    await triggerDownload(projectName, format, quality, setProgress)
-    setProgress(100)
-    setExporting(false)
-    setDone(true)
+    setError('')
+    try {
+      await triggerDownload(projectName, format, quality, setProgress)
+      setProgress(100)
+      setExporting(false)
+      setDone(true)
+    } catch (err) {
+      setExporting(false)
+      setProgress(0)
+      if (!window.MediaRecorder) {
+        setError('Video export is not supported in this browser. Please use Chrome or Edge.')
+      } else if (err?.name === 'SecurityError') {
+        setError('Export blocked by browser security policy. Try downloading from a different browser.')
+      } else {
+        setError(err?.message || 'Export failed. Please try again.')
+      }
+    }
   }
 
   return (
@@ -189,10 +203,19 @@ export default function ExportModal({ onClose, projectName = 'Untitled Project',
                   </p>
                 </div>
               )}
+              {error && (
+                <div className="bg-red-950/40 border border-red-800/50 rounded-xl p-3 flex items-start gap-2.5">
+                  <span className="text-red-400 text-sm mt-0.5 shrink-0">✕</span>
+                  <div className="flex-1">
+                    <p className="text-xs text-red-300 font-medium mb-0.5">Export Failed</p>
+                    <p className="text-[10px] text-red-400/80 leading-relaxed">{error}</p>
+                  </div>
+                </div>
+              )}
               <div className="flex gap-2 justify-end mt-1">
                 <button onClick={onClose} className="btn-ghost">Cancel</button>
                 <button onClick={startExport} disabled={exporting} className="btn-accent">
-                  <Download size={13} /> {exporting ? 'Exporting…' : 'Export'}
+                  <Download size={13} /> {exporting ? 'Exporting…' : error ? 'Retry' : 'Export'}
                 </button>
               </div>
             </>

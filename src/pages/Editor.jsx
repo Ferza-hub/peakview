@@ -70,10 +70,15 @@ export default function Editor() {
 
   const persist = useCallback((t, m, fmt, name) => {
     setSaveStatus('saving')
-    saveProjectData(pid, { tracks: t, mediaFiles: m, format: fmt })
-    upsertProjectMeta(pid, { title: name })
-    setSaveStatus('saved')
-  }, [pid])
+    try {
+      saveProjectData(pid, { tracks: t, mediaFiles: m, format: fmt })
+      upsertProjectMeta(pid, { title: name })
+      setSaveStatus('saved')
+    } catch (e) {
+      setSaveStatus('unsaved')
+      toast.add('Save failed — changes kept locally', 'error')
+    }
+  }, [pid, toast])
 
   // Autosave 30s
   useEffect(() => {
