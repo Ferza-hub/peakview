@@ -169,14 +169,14 @@ export default function Timeline({
         <button
           title="Split at playhead"
           onClick={() => selectedClip && onSplitClip(selectedClip._trackId, selectedClip.id)}
-          className="btn-ghost p-1"
+          className="btn-ghost p-2"
         >
           <Scissors size={13} />
         </button>
         <div className="w-px h-4 bg-[#2A2A2A]" />
-        <button onClick={() => setZoom(z => Math.max(0.4, Math.round((z - 0.2) * 10) / 10))} className="btn-ghost p-1"><ZoomOut size={13} /></button>
+        <button onClick={() => setZoom(z => Math.max(0.4, Math.round((z - 0.2) * 10) / 10))} className="btn-ghost p-2"><ZoomOut size={13} /></button>
         <span className="text-[11px] text-zinc-500 w-10 text-center">{Math.round(zoom * 100)}%</span>
-        <button onClick={() => setZoom(z => Math.min(3,   Math.round((z + 0.2) * 10) / 10))} className="btn-ghost p-1"><ZoomIn  size={13} /></button>
+        <button onClick={() => setZoom(z => Math.min(3,   Math.round((z + 0.2) * 10) / 10))} className="btn-ghost p-2"><ZoomIn  size={13} /></button>
         <div className="w-px h-4 bg-[#2A2A2A]" />
         <span className="text-[11px] text-zinc-500 font-mono">{fmtTimeShort(currentTime)} / {fmtTimeShort(totalDuration)}</span>
         <span className="text-[10px] text-zinc-700 ml-2">Space · ←→5s · Del · Ctrl+Z/S</span>
@@ -194,11 +194,11 @@ export default function Timeline({
             >
               <span className="text-[9px] w-3">{ICONS[track.type]}</span>
               <span className="text-[10px] font-medium text-zinc-400 flex-1 truncate">{track.label}</span>
-              <button onClick={() => toggleMute(track.id)} className="text-zinc-600 hover:text-zinc-400 p-0.5 transition-colors">
-                {track.muted ? <VolumeX size={10} /> : <Volume2 size={10} />}
+              <button onClick={() => toggleMute(track.id)} className="text-zinc-600 hover:text-zinc-400 p-1.5 transition-colors">
+                {track.muted ? <VolumeX size={11} /> : <Volume2 size={11} />}
               </button>
-              <button onClick={() => toggleLock(track.id)} className="text-zinc-600 hover:text-zinc-400 p-0.5 transition-colors">
-                {track.locked ? <Lock size={10} /> : <Unlock size={10} />}
+              <button onClick={() => toggleLock(track.id)} className="text-zinc-600 hover:text-zinc-400 p-1.5 transition-colors">
+                {track.locked ? <Lock size={11} /> : <Unlock size={11} />}
               </button>
             </div>
           ))}
@@ -304,27 +304,31 @@ export default function Timeline({
                       {/* Delete × */}
                       {isSel && !track.locked && (
                         <button
-                          className="absolute top-0.5 right-0.5 w-4 h-4 rounded-full bg-red-600/90 hover:bg-red-500 flex items-center justify-center z-20 transition-colors"
+                          className="absolute top-0.5 right-0.5 w-6 h-6 rounded-full bg-red-600/90 hover:bg-red-500 flex items-center justify-center z-20 transition-colors"
                           onPointerDown={e => e.stopPropagation()}
                           onClick={e => { e.stopPropagation(); onDeleteClip(track.id, clip.id, clip.label) }}
                         >
-                          <X size={8} className="text-white" />
+                          <X size={10} className="text-white" />
                         </button>
                       )}
 
-                      {/* Resize handles */}
+                      {/* Resize handles — wide invisible touch zone with narrow visible strip */}
                       {isSel && !track.locked && (
                         <>
                           <div
-                            className="absolute left-0 inset-y-0 w-3 cursor-w-resize bg-white/20 hover:bg-white/40 z-20 transition-colors"
+                            className="absolute left-0 inset-y-0 w-6 cursor-w-resize z-20 flex items-center"
                             style={{ touchAction: 'none' }}
                             onPointerDown={e => startDrag(e, track.id, clip, 'left')}
-                          />
+                          >
+                            <div className="w-1 h-full bg-white/40 hover:bg-white/70 transition-colors" />
+                          </div>
                           <div
-                            className="absolute right-0 inset-y-0 w-3 cursor-e-resize bg-white/20 hover:bg-white/40 z-20 transition-colors"
+                            className="absolute right-0 inset-y-0 w-6 cursor-e-resize z-20 flex items-center justify-end"
                             style={{ touchAction: 'none' }}
                             onPointerDown={e => startDrag(e, track.id, clip, 'right')}
-                          />
+                          >
+                            <div className="w-1 h-full bg-white/40 hover:bg-white/70 transition-colors" />
+                          </div>
                         </>
                       )}
                     </div>

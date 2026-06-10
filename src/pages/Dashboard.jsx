@@ -171,6 +171,8 @@ export default function Dashboard() {
   const [playingTrack, setPlayingTrack] = useState(null)
   const [musicFilter, setMusicFilter]   = useState('All')
   const [previewAsset, setPreviewAsset] = useState(null)
+  const [showUserMenu, setShowUserMenu] = useState(false)
+  const userMenuRef = useRef(null)
   const audioCtxRef = useRef(null)
   const renameRef   = useRef(null)
 
@@ -192,6 +194,14 @@ export default function Dashboard() {
     document.addEventListener('pointerdown', h)
     return () => document.removeEventListener('pointerdown', h)
   }, [])
+
+  // close user menu on outside tap
+  useEffect(() => {
+    if (!showUserMenu) return
+    const close = (e) => { if (!userMenuRef.current?.contains(e.target)) setShowUserMenu(false) }
+    document.addEventListener('pointerdown', close)
+    return () => document.removeEventListener('pointerdown', close)
+  }, [showUserMenu])
 
   // cleanup audio on unmount
   useEffect(() => () => { if (audioCtxRef.current) audioCtxRef.current.close() }, [])
@@ -316,20 +326,24 @@ export default function Dashboard() {
               placeholder="Search projects…"
               className="bg-[#1A1A1A] border border-[#2A2A2A] rounded-lg pl-8 pr-3 py-1.5 text-sm text-zinc-200 placeholder-zinc-600 focus:outline-none focus:border-violet-500/60 w-48 transition-colors" />
           </div>
-          <div className="relative group">
-            <div className="w-8 h-8 rounded-full bg-gradient-to-br from-violet-500 to-pink-500 flex items-center justify-center text-white text-sm font-bold cursor-pointer select-none">
+          <div className="relative" ref={userMenuRef}>
+            <button
+              onClick={() => setShowUserMenu(p => !p)}
+              className="w-9 h-9 rounded-full bg-gradient-to-br from-violet-500 to-pink-500 flex items-center justify-center text-white text-sm font-bold select-none">
               {user?.avatar || 'U'}
-            </div>
-            <div className="absolute right-0 top-10 bg-[#1A1A1A] border border-[#2A2A2A] rounded-xl shadow-2xl z-50 overflow-hidden min-w-[180px] opacity-0 group-hover:opacity-100 pointer-events-none group-hover:pointer-events-auto transition-opacity">
-              <div className="px-3 py-2.5 border-b border-[#252525]">
-                <p className="text-xs font-semibold text-zinc-200">{user?.name}</p>
-                <p className="text-[10px] text-zinc-500">{user?.email}</p>
-                <span className="text-[9px] bg-violet-900/60 text-violet-300 px-1.5 py-0.5 rounded-full mt-1 inline-block">{user?.plan}</span>
+            </button>
+            {showUserMenu && (
+              <div className="absolute right-0 top-11 bg-[#1A1A1A] border border-[#2A2A2A] rounded-xl shadow-2xl z-50 overflow-hidden min-w-[180px]">
+                <div className="px-3 py-2.5 border-b border-[#252525]">
+                  <p className="text-xs font-semibold text-zinc-200">{user?.name}</p>
+                  <p className="text-[10px] text-zinc-500">{user?.email}</p>
+                  <span className="text-[9px] bg-violet-900/60 text-violet-300 px-1.5 py-0.5 rounded-full mt-1 inline-block">{user?.plan}</span>
+                </div>
+                <button onClick={logout} className="flex items-center gap-2 w-full px-3 py-3 text-xs text-red-400 hover:bg-red-950/40 transition-colors">
+                  Sign out
+                </button>
               </div>
-              <button onClick={logout} className="flex items-center gap-2 w-full px-3 py-2 text-xs text-red-400 hover:bg-red-950/40 transition-colors">
-                Sign out
-              </button>
-            </div>
+            )}
           </div>
         </div>
       </header>
@@ -382,7 +396,7 @@ export default function Dashboard() {
                   return (
                     <div key={p.id}
                       className="rounded-2xl overflow-hidden border border-[#1A1A1A] hover:border-[#2A2A2A] cursor-pointer transition-all group relative"
-                      onMouseEnter={() => setHover(p.id)} onMouseLeave={() => setHover(null)}
+                      onPointerEnter={() => setHover(p.id)} onPointerLeave={() => setHover(null)}
                       onClick={() => !isRen && navigate(`/editor/${p.id}`)}>
 
                       {/* Animated thumbnail */}
@@ -395,18 +409,18 @@ export default function Dashboard() {
                             <Play size={18} className="text-white ml-1" />
                           </div>
                           {/* Quick-action buttons on thumbnail */}
-                          <div className="absolute top-2 left-2 flex gap-1.5" onClick={e => e.stopPropagation()}>
+                          <div className="absolute top-2 left-2 flex gap-1.5 show-on-hover" onClick={e => e.stopPropagation()}>
                             <button
                               onClick={e => startRename(p, e)}
                               title="Rename"
-                              className="w-7 h-7 rounded-lg bg-black/60 backdrop-blur-sm border border-white/10 flex items-center justify-center hover:bg-white/20 transition-colors">
-                              <Pencil size={11} className="text-white/80" />
+                              className="w-9 h-9 rounded-lg bg-black/60 backdrop-blur-sm border border-white/10 flex items-center justify-center hover:bg-white/20 transition-colors">
+                              <Pencil size={13} className="text-white/80" />
                             </button>
                             <button
                               onClick={e => { e.stopPropagation(); setMenu(null); setConfirmDel(p) }}
                               title="Delete"
-                              className="w-7 h-7 rounded-lg bg-black/60 backdrop-blur-sm border border-white/10 flex items-center justify-center hover:bg-red-600/70 transition-colors">
-                              <Trash2 size={11} className="text-white/80" />
+                              className="w-9 h-9 rounded-lg bg-black/60 backdrop-blur-sm border border-white/10 flex items-center justify-center hover:bg-red-600/70 transition-colors">
+                              <Trash2 size={13} className="text-white/80" />
                             </button>
                           </div>
                         </div>

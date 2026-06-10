@@ -329,19 +329,19 @@ export default function LeftPanel({
                         <p className="text-[11px] text-zinc-300 truncate font-medium">{m.name}</p>
                         <p className="text-[9px] text-zinc-600">{m.type} · {m.duration}</p>
                       </div>
-                      <div className="flex gap-0.5">
+                      <div className="flex gap-0.5 shrink-0">
                         <button
                           onClick={() => onAddToTimeline && onAddToTimeline(m)}
                           title="Add to timeline"
-                          className="p-1.5 text-violet-500 hover:text-violet-300 transition-colors"
+                          className="p-2 text-violet-500 hover:text-violet-300 transition-colors"
                         >
-                          <Plus size={11} />
+                          <Plus size={12} />
                         </button>
-                        <button onClick={() => { setEditMedia(m) }} className="p-1.5 text-zinc-600 hover:text-zinc-300 transition-colors opacity-0 group-hover:opacity-100">
-                          <Pencil size={10} />
+                        <button onClick={() => { setEditMedia(m) }} className="p-2 text-zinc-600 hover:text-zinc-300 transition-colors">
+                          <Pencil size={11} />
                         </button>
-                        <button onClick={() => setConfirmDelMedia(m)} className="p-1.5 text-zinc-600 hover:text-red-400 transition-colors opacity-0 group-hover:opacity-100">
-                          <Trash2 size={10} />
+                        <button onClick={() => setConfirmDelMedia(m)} className="p-2 text-zinc-600 hover:text-red-400 transition-colors">
+                          <Trash2 size={11} />
                         </button>
                       </div>
                     </div>
@@ -420,9 +420,9 @@ export default function LeftPanel({
                           <p className="text-[11px] text-zinc-300 leading-snug">{cap.text || cap.label}</p>
                           <p className="text-[9px] text-zinc-600 mt-0.5">{cap.start.toFixed(1)}s – {(cap.start + cap.duration).toFixed(1)}s</p>
                         </div>
-                        <div className="flex gap-0.5 opacity-0 group-hover:opacity-100 transition-opacity">
-                          <button onClick={() => startEditCap(cap)} className="p-1 text-zinc-500 hover:text-zinc-300"><Pencil size={10} /></button>
-                          <button onClick={() => setConfirmDelCap(cap)} className="p-1 text-zinc-500 hover:text-red-400"><Trash2 size={10} /></button>
+                        <div className="flex gap-0.5 shrink-0">
+                          <button onClick={() => startEditCap(cap)} className="p-2 text-zinc-500 hover:text-zinc-300"><Pencil size={11} /></button>
+                          <button onClick={() => setConfirmDelCap(cap)} className="p-2 text-zinc-500 hover:text-red-400"><Trash2 size={11} /></button>
                         </div>
                       </div>
                     )}
@@ -486,12 +486,12 @@ export default function LeftPanel({
                     onDragStart={e => e.dataTransfer.setData('application/peakedit-media', JSON.stringify({ id: m.id, name: m.title, type: 'audio', duration: m.duration, color: '#10B981' }))}
                     className="flex items-center gap-2 px-2 py-1.5 rounded-lg bg-[#141414] border border-[#1F1F1F] hover:border-[#2A2A2A] cursor-grab group transition-all">
                     <button onClick={() => playMusicPreview(m.id, m.genre)}
-                      className={`w-6 h-6 rounded-full flex items-center justify-center shrink-0 transition-colors ${
+                      className={`w-8 h-8 rounded-full flex items-center justify-center shrink-0 transition-colors ${
                         playingTrack === m.id
                           ? 'bg-emerald-600 animate-pulse'
                           : 'bg-violet-900/60 hover:bg-violet-600'
                       }`}>
-                      <Play size={9} className={`${playingTrack === m.id ? 'text-white' : 'text-violet-300'} ml-0.5`} />
+                      <Play size={11} className={`${playingTrack === m.id ? 'text-white' : 'text-violet-300'} ml-0.5`} />
                     </button>
                     <div className="flex-1 min-w-0">
                       <p className="text-[11px] text-zinc-300 truncate font-medium">{m.title}</p>

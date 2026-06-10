@@ -3,29 +3,39 @@
 @tailwind utilities;
 
 @layer base {
-  * { box-sizing: border-box; }
+  * {
+    box-sizing: border-box;
+    -webkit-tap-highlight-color: transparent;
+  }
   body {
     font-family: 'Inter', system-ui, sans-serif;
     background-color: #080808;
     color: #E4E4E7;
     margin: 0; padding: 0;
   }
+  button, a, label, select { touch-action: manipulation; }
   ::-webkit-scrollbar { width: 4px; height: 4px; }
   ::-webkit-scrollbar-track { background: #111; }
   ::-webkit-scrollbar-thumb { background: #383838; border-radius: 2px; }
   ::-webkit-scrollbar-thumb:hover { background: #555; }
-  input[type="range"] { -webkit-appearance: none; appearance: none; height: 4px; border-radius: 2px; background: #2A2A2A; outline: none; }
-  input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; width: 14px; height: 14px; border-radius: 50%; background: #7C3AED; cursor: pointer; }
+  input[type="range"] { -webkit-appearance: none; appearance: none; height: 6px; border-radius: 3px; background: #2A2A2A; outline: none; }
+  input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; width: 20px; height: 20px; border-radius: 50%; background: #7C3AED; cursor: pointer; }
+  input[type="range"]::-moz-range-thumb { width: 20px; height: 20px; border: none; border-radius: 50%; background: #7C3AED; cursor: pointer; }
 }
 
 @layer components {
-  .btn { @apply inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-all duration-150 cursor-pointer; }
+  .btn { @apply inline-flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-medium transition-all duration-150 cursor-pointer min-h-[36px]; }
   .btn-ghost { @apply btn text-zinc-400 hover:text-zinc-100 hover:bg-white/10; }
   .btn-accent { @apply btn bg-violet-600 hover:bg-violet-500 text-white; }
   .btn-surface { @apply btn bg-ed-surface hover:bg-ed-hover text-zinc-300 border border-ed-border; }
   .panel-label { @apply text-[10px] font-semibold tracking-widest text-zinc-500 uppercase mb-2; }
   .field-label { @apply text-xs text-zinc-400 mb-1 block; }
-  .input-dark { @apply w-full bg-ed-surface border border-ed-border rounded-md px-2 py-1.5 text-xs text-zinc-200 focus:outline-none focus:border-violet-500/60; }
+  .input-dark { @apply w-full bg-ed-surface border border-ed-border rounded-md px-2 py-2 text-xs text-zinc-200 focus:outline-none focus:border-violet-500/60 min-h-[36px]; }
   .track-row { @apply flex border-b border-ed-border; }
   .chip { @apply inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium; }
+}
+
+/* Touch device: show hover-hidden action buttons */
+@media (hover: none) {
+  .show-on-hover { opacity: 1 !important; pointer-events: auto !important; }
 }
