@@ -394,6 +394,21 @@ export default function Dashboard() {
                           <div className="w-12 h-12 rounded-full bg-white/20 backdrop-blur-sm border border-white/30 flex items-center justify-center">
                             <Play size={18} className="text-white ml-1" />
                           </div>
+                          {/* Quick-action buttons on thumbnail */}
+                          <div className="absolute top-2 left-2 flex gap-1.5" onClick={e => e.stopPropagation()}>
+                            <button
+                              onClick={e => startRename(p, e)}
+                              title="Rename"
+                              className="w-7 h-7 rounded-lg bg-black/60 backdrop-blur-sm border border-white/10 flex items-center justify-center hover:bg-white/20 transition-colors">
+                              <Pencil size={11} className="text-white/80" />
+                            </button>
+                            <button
+                              onClick={e => { e.stopPropagation(); setMenu(null); setConfirmDel(p) }}
+                              title="Delete"
+                              className="w-7 h-7 rounded-lg bg-black/60 backdrop-blur-sm border border-white/10 flex items-center justify-center hover:bg-red-600/70 transition-colors">
+                              <Trash2 size={11} className="text-white/80" />
+                            </button>
+                          </div>
                         </div>
 
                         {/* Collaborator avatars */}
