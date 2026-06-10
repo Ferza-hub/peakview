@@ -73,14 +73,14 @@ export const stockMusic = [
 ]
 
 export const templates = [
-  { id: 't1', name: 'YouTube Intro',      cat: 'Intro',       thumb: '#7C3AED' },
-  { id: 't2', name: 'TikTok Hook',        cat: 'Intro',       thumb: '#EC4899' },
-  { id: 't3', name: 'Subscribe Outro',    cat: 'Outro',       thumb: '#10B981' },
-  { id: 't4', name: 'Channel Outro',      cat: 'Outro',       thumb: '#06B6D4' },
-  { id: 't5', name: 'Name Lower Third',   cat: 'Lower Third', thumb: '#F59E0B' },
-  { id: 't6', name: 'Social Bug',         cat: 'Lower Third', thumb: '#EF4444' },
-  { id: 't7', name: 'Like+Subscribe CTA', cat: 'CTA',         thumb: '#8B5CF6' },
-  { id: 't8', name: 'End Screen',         cat: 'CTA',         thumb: '#D97706' },
+  { id: 't1', name: 'YouTube Intro',      cat: 'Intro',       thumb: '#7C3AED', photo: 'https://images.unsplash.com/photo-1611532736597-de2d4265fba3?w=400&auto=format&fit=crop&q=80' },
+  { id: 't2', name: 'TikTok Hook',        cat: 'Intro',       thumb: '#EC4899', photo: 'https://images.unsplash.com/photo-1574717024653-61fd2cf4d44d?w=400&auto=format&fit=crop&q=80' },
+  { id: 't3', name: 'Subscribe Outro',    cat: 'Outro',       thumb: '#10B981', photo: 'https://images.unsplash.com/photo-1598488035139-bdbb2231ce04?w=400&auto=format&fit=crop&q=80' },
+  { id: 't4', name: 'Channel Outro',      cat: 'Outro',       thumb: '#06B6D4', photo: 'https://images.unsplash.com/photo-1492691527719-9d1e07e534b4?w=400&auto=format&fit=crop&q=80' },
+  { id: 't5', name: 'Name Lower Third',   cat: 'Lower Third', thumb: '#F59E0B', photo: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=400&auto=format&fit=crop&q=80' },
+  { id: 't6', name: 'Social Bug',         cat: 'Lower Third', thumb: '#EF4444', photo: 'https://images.unsplash.com/photo-1526779259212-939e64788e3c?w=400&auto=format&fit=crop&q=80' },
+  { id: 't7', name: 'Like+Subscribe CTA', cat: 'CTA',         thumb: '#8B5CF6', photo: 'https://images.unsplash.com/photo-1553877522-43269d4ea984?w=400&auto=format&fit=crop&q=80' },
+  { id: 't8', name: 'End Screen',         cat: 'CTA',         thumb: '#D97706', photo: 'https://images.unsplash.com/photo-1551434678-e076c223a692?w=400&auto=format&fit=crop&q=80' },
 ]
 
 export const transitions = [

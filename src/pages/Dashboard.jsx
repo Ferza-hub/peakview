@@ -5,7 +5,7 @@ import {
   Cpu, Video, Users, Pencil, Trash2, Check, X,
   Music, Film, Wand2, Download
 } from 'lucide-react'
-import { getProjects, saveProjects, upsertProjectMeta, deleteProjectData, saveProjectData, setLastId } from '../utils/storage'
+import { getProjects, saveProjects, upsertProjectMeta, deleteProjectData, saveProjectData, setLastId, getProjectData } from '../utils/storage'
 import { genId } from '../utils/helpers'
 import { useToast } from '../context/ToastContext'
 import ConfirmDialog from '../components/ui/ConfirmDialog'
@@ -182,6 +182,7 @@ export default function Dashboard() {
   const [navTab, setNavTab]         = useState('Projects')
   const [playingTrack, setPlayingTrack] = useState(null)
   const [musicFilter, setMusicFilter]   = useState('All')
+  const [previewAsset, setPreviewAsset] = useState(null)
   const audioCtxRef = useRef(null)
   const renameRef   = useRef(null)
 
@@ -280,6 +281,23 @@ export default function Dashboard() {
 
   const GENRES = ['All', ...new Set(stockMusic.map(m => m.genre))]
   const filteredMusic = musicFilter === 'All' ? stockMusic : stockMusic.filter(m => m.genre === musicFilter)
+
+  const addToProject = useCallback((item, type) => {
+    const all = getProjects()
+    if (!all.length) { toast.add('Create a project first', 'warning'); return }
+    const latest = [...all].sort((a, b) => new Date(b.updatedAt) - new Date(a.updatedAt))[0]
+    const data = getProjectData(latest.id)
+    if (!data) return
+    if ((data.mediaFiles || []).some(m => m.id === item.id)) {
+      toast.add(`"${item.name || item.title}" already in "${latest.title}"`, 'info')
+      return
+    }
+    const newMedia = { id: item.id, name: item.name || item.title, type, duration: item.duration, color: type === 'audio' ? '#10B981' : '#7C3AED', ...(item.thumb ? { thumb: item.thumb } : {}) }
+    saveProjectData(latest.id, { ...data, mediaFiles: [...(data.mediaFiles || []), newMedia] })
+    const ts = new Date().toISOString()
+    saveProjects(all.map(p => p.id === latest.id ? { ...p, updatedAt: ts } : p))
+    toast.add(`"${newMedia.name}" added to "${latest.title}"`, 'success')
+  }, [toast])
 
   return (
     <div className="min-h-screen bg-[#080808] text-zinc-100 flex flex-col">
@@ -466,19 +484,17 @@ export default function Dashboard() {
                 {templates.map(t => (
                   <div key={t.id} onClick={createProject}
                     className="rounded-2xl overflow-hidden border border-[#1A1A1A] hover:border-violet-600/50 cursor-pointer transition-all group">
-                    <div className="h-32 relative overflow-hidden"
-                      style={{ background: `linear-gradient(135deg, ${t.thumb}40, #080808)` }}>
-                      {/* Animated gradient lines */}
-                      <div className="absolute inset-0 flex flex-col justify-evenly px-3 opacity-20">
-                        {[80, 60, 40].map((w, i) => (
-                          <div key={i} className="h-1 rounded-full" style={{ width: `${w}%`, background: t.thumb }} />
-                        ))}
-                      </div>
-                      <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity">
-                        <span className="text-xs text-white font-semibold bg-violet-600 px-3 py-1.5 rounded-lg">Use Template</span>
+                    <div className="h-32 relative overflow-hidden bg-black">
+                      {t.photo
+                        ? <img src={t.photo} alt="" className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" style={{ filter: 'brightness(0.6) saturate(1.1)' }} loading="lazy" />
+                        : <div className="absolute inset-0" style={{ background: `linear-gradient(135deg, ${t.thumb}40, #080808)` }} />
+                      }
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent" />
+                      <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity">
+                        <span className="text-xs text-white font-semibold bg-violet-600 px-3 py-1.5 rounded-lg shadow-lg">Use Template</span>
                       </div>
                       <div className="absolute top-2 left-2 text-[10px] font-medium px-1.5 py-0.5 rounded-full"
-                        style={{ backgroundColor: t.thumb + '33', color: t.thumb }}>
+                        style={{ backgroundColor: t.thumb + '33', color: t.thumb, border: `1px solid ${t.thumb}55` }}>
                         {t.cat}
                       </div>
                     </div>
@@ -520,12 +536,12 @@ export default function Dashboard() {
                           <FootageThumb idx={idx} />
                           <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
                             <button
-                              onClick={() => toast.add(`Preview: ${f.name}`, 'info')}
+                              onClick={e => { e.stopPropagation(); setPreviewAsset({ ...f, type: 'video' }) }}
                               className="flex items-center gap-1.5 bg-white/20 hover:bg-white/30 backdrop-blur-sm text-white text-xs px-3 py-1.5 rounded-lg transition-colors border border-white/20">
                               <Play size={11} /> Preview
                             </button>
                             <button
-                              onClick={() => toast.add(`"${f.name}" added to project`, 'success')}
+                              onClick={e => { e.stopPropagation(); addToProject(f, 'video') }}
                               className="flex items-center gap-1.5 bg-violet-600/80 hover:bg-violet-500 backdrop-blur-sm text-white text-xs px-3 py-1.5 rounded-lg transition-colors">
                               <Plus size={11} /> Use
                             </button>
@@ -626,8 +642,9 @@ export default function Dashboard() {
 
                         {/* Add to project */}
                         <button
-                          onClick={() => toast.add(`"${m.title}" added to project`, 'success')}
-                          className="w-8 h-8 rounded-lg bg-[#1A1A1A] hover:bg-violet-900/40 border border-[#2A2A2A] hover:border-violet-700/50 flex items-center justify-center text-zinc-600 hover:text-violet-400 transition-all shrink-0">
+                          onClick={() => addToProject(m, 'audio')}
+                          className="w-8 h-8 rounded-lg bg-[#1A1A1A] hover:bg-violet-900/40 border border-[#2A2A2A] hover:border-violet-700/50 flex items-center justify-center text-zinc-600 hover:text-violet-400 transition-all shrink-0"
+                          title="Add to latest project">
                           <Plus size={13} />
                         </button>
                       </div>
@@ -712,6 +729,49 @@ export default function Dashboard() {
           message={`"${confirmDel.title}" will be permanently deleted.`}
           onConfirm={doDelete} onCancel={() => setConfirmDel(null)}
         />
+      )}
+
+      {/* Asset preview lightbox */}
+      {previewAsset && (
+        <div
+          className="fixed inset-0 z-[9000] flex items-center justify-center bg-black/85 backdrop-blur-sm"
+          onClick={() => setPreviewAsset(null)}>
+          <div
+            className="bg-[#111] border border-[#2A2A2A] rounded-2xl overflow-hidden w-[420px] shadow-2xl"
+            onClick={e => e.stopPropagation()}>
+            <div className="aspect-video relative overflow-hidden bg-zinc-900">
+              {previewAsset.thumb
+                ? <img src={previewAsset.thumb} alt="" className="w-full h-full object-cover" style={{ filter: 'brightness(0.8) saturate(1.15)' }} />
+                : <div className="w-full h-full flex items-center justify-center"><Film size={32} className="text-zinc-600" /></div>
+              }
+              <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent" />
+              <div className="absolute bottom-3 left-4 right-10">
+                <p className="text-white font-semibold text-sm truncate">{previewAsset.name}</p>
+                <p className="text-zinc-400 text-xs mt-0.5">{previewAsset.duration} · {previewAsset.type || 'video'}</p>
+              </div>
+              <button onClick={() => setPreviewAsset(null)}
+                className="absolute top-2 right-2 w-7 h-7 rounded-full bg-black/60 hover:bg-black/80 flex items-center justify-center text-zinc-400 hover:text-white transition-colors">
+                <X size={14} />
+              </button>
+            </div>
+            {previewAsset.tags && (
+              <div className="px-4 pt-3 flex flex-wrap gap-1">
+                {previewAsset.tags.split(' ').map(tag => (
+                  <span key={tag} className="text-[10px] px-2 py-0.5 rounded-full bg-violet-900/40 text-violet-300 border border-violet-800/40">{tag}</span>
+                ))}
+              </div>
+            )}
+            <div className="p-4 flex gap-2">
+              <button onClick={() => setPreviewAsset(null)} className="flex-1 py-2 rounded-xl border border-[#2A2A2A] text-zinc-400 hover:text-zinc-200 text-sm transition-colors">
+                Close
+              </button>
+              <button onClick={() => { addToProject(previewAsset, previewAsset.type || 'video'); setPreviewAsset(null) }}
+                className="flex-1 py-2 rounded-xl bg-violet-600 hover:bg-violet-500 text-white text-sm font-medium transition-colors flex items-center justify-center gap-2">
+                <Plus size={14} /> Add to Project
+              </button>
+            </div>
+          </div>
+        </div>
       )}
     </div>
   )

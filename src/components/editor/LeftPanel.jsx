@@ -302,11 +302,16 @@ export default function LeftPanel({
                   <div key={t.id}
                     onClick={() => toast.add(`Template "${t.name}" applied`, 'success')}
                     className="rounded-lg overflow-hidden border border-[#1F1F1F] hover:border-violet-500/50 cursor-pointer transition-all group">
-                    <div className="h-12 flex items-center justify-center relative" style={{ background: `linear-gradient(135deg, ${t.thumb}33, #111)` }}>
-                      <div className="w-6 h-6 rounded-md" style={{ background: t.thumb + '60' }} />
-                      <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity">
-                        <span className="text-[9px] text-white font-semibold">Apply</span>
+                    <div className="h-12 relative overflow-hidden bg-black">
+                      {t.photo
+                        ? <img src={t.photo} alt="" className="absolute inset-0 w-full h-full object-cover transition-transform duration-300 group-hover:scale-105" style={{ filter: 'brightness(0.55) saturate(1.1)' }} loading="lazy" />
+                        : <div className="absolute inset-0" style={{ background: `linear-gradient(135deg, ${t.thumb}40, #111)` }} />
+                      }
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent" />
+                      <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity">
+                        <span className="text-[9px] text-white font-bold tracking-wide">Apply</span>
                       </div>
+                      <span className="absolute top-1 left-1 text-[7px] font-semibold px-1 py-0.5 rounded" style={{ backgroundColor: t.thumb + '55', color: t.thumb }}>{t.cat}</span>
                     </div>
                     <div className="px-1.5 py-1 bg-[#141414]">
                       <p className="text-[10px] text-zinc-400 truncate">{t.name}</p>

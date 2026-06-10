@@ -118,7 +118,7 @@ function DemoCanvas({ clip, style }) {
 
 // Format → canvas container dimensions
 const FORMAT_STYLE = {
-  '16:9': { width: '100%', maxWidth: 460 },
+  '16:9': { width: '100%', maxWidth: 460, aspectRatio: '16/9' },
   '9:16': { width: 158,  height: 280 },
   '1:1':  { width: 250,  height: 250 },
 }
