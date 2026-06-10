@@ -73,14 +73,124 @@ export const stockMusic = [
 ]
 
 export const templates = [
-  { id: 't1', name: 'YouTube Intro',      cat: 'Intro',       thumb: '#7C3AED', photo: 'https://images.unsplash.com/photo-1611532736597-de2d4265fba3?w=400&auto=format&fit=crop&q=80' },
-  { id: 't2', name: 'TikTok Hook',        cat: 'Intro',       thumb: '#EC4899', photo: 'https://images.unsplash.com/photo-1574717024653-61fd2cf4d44d?w=400&auto=format&fit=crop&q=80' },
-  { id: 't3', name: 'Subscribe Outro',    cat: 'Outro',       thumb: '#10B981', photo: 'https://images.unsplash.com/photo-1598488035139-bdbb2231ce04?w=400&auto=format&fit=crop&q=80' },
-  { id: 't4', name: 'Channel Outro',      cat: 'Outro',       thumb: '#06B6D4', photo: 'https://images.unsplash.com/photo-1492691527719-9d1e07e534b4?w=400&auto=format&fit=crop&q=80' },
-  { id: 't5', name: 'Name Lower Third',   cat: 'Lower Third', thumb: '#F59E0B', photo: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=400&auto=format&fit=crop&q=80' },
-  { id: 't6', name: 'Social Bug',         cat: 'Lower Third', thumb: '#EF4444', photo: 'https://images.unsplash.com/photo-1526779259212-939e64788e3c?w=400&auto=format&fit=crop&q=80' },
-  { id: 't7', name: 'Like+Subscribe CTA', cat: 'CTA',         thumb: '#8B5CF6', photo: 'https://images.unsplash.com/photo-1553877522-43269d4ea984?w=400&auto=format&fit=crop&q=80' },
-  { id: 't8', name: 'End Screen',         cat: 'CTA',         thumb: '#D97706', photo: 'https://images.unsplash.com/photo-1551434678-e076c223a692?w=400&auto=format&fit=crop&q=80' },
+  {
+    id: 't1', name: 'YouTube Intro', cat: 'Intro', thumb: '#7C3AED',
+    photo: 'https://images.unsplash.com/photo-1611532736597-de2d4265fba3?w=400&auto=format&fit=crop&q=80',
+    clips: {
+      v1: [
+        { id: 'tp1c1', label: 'Title Slide',    start: 0,  duration: 4,  color: '#7C3AED', type: 'video' },
+        { id: 'tp1c2', label: 'Logo Animation', start: 4,  duration: 4,  color: '#6D28D9', type: 'video' },
+        { id: 'tp1c3', label: 'Channel Name',   start: 8,  duration: 4,  color: '#5B21B6', type: 'video' },
+        { id: 'tp1c4', label: 'Subscribe CTA',  start: 12, duration: 3,  color: '#4C1D95', type: 'video' },
+      ],
+      a1: [{ id: 'tp1a1', label: 'Intro Sting', start: 0, duration: 15, color: '#10B981', type: 'audio' }],
+      sub: [
+        { id: 'tp1s1', label: 'Welcome back!', text: 'Welcome back! 👋', start: 0.5, duration: 3, color: '#EF4444', type: 'subtitle', animation: 'Fade In' },
+        { id: 'tp1s2', label: 'Subscribe',     text: "Don't forget to subscribe 🔔", start: 12, duration: 2.5, color: '#EF4444', type: 'subtitle', animation: 'Slide Up' },
+      ],
+    },
+  },
+  {
+    id: 't2', name: 'TikTok Hook', cat: 'Intro', thumb: '#EC4899',
+    photo: 'https://images.unsplash.com/photo-1574717024653-61fd2cf4d44d?w=400&auto=format&fit=crop&q=80',
+    clips: {
+      v1: [
+        { id: 'tp2c1', label: 'Hook Moment',  start: 0, duration: 3, color: '#EC4899', type: 'video' },
+        { id: 'tp2c2', label: 'Value Reveal', start: 3, duration: 3, color: '#DB2777', type: 'video' },
+        { id: 'tp2c3', label: 'CTA Payoff',   start: 6, duration: 2, color: '#BE185D', type: 'video' },
+      ],
+      a1: [{ id: 'tp2a1', label: 'TikTok Beat', start: 0, duration: 8, color: '#10B981', type: 'audio' }],
+      sub: [
+        { id: 'tp2s1', label: 'Wait for it',        text: 'Wait for it... 👀', start: 0.3, duration: 2.5, color: '#EF4444', type: 'subtitle', animation: 'Pop' },
+        { id: 'tp2s2', label: 'This changed',       text: 'This changed everything', start: 3.2, duration: 2.5, color: '#EF4444', type: 'subtitle', animation: 'Bounce' },
+        { id: 'tp2s3', label: 'Follow for more',    text: 'Follow for more 🔥', start: 6.2, duration: 1.5, color: '#EF4444', type: 'subtitle', animation: 'Slide Up' },
+      ],
+    },
+  },
+  {
+    id: 't3', name: 'Subscribe Outro', cat: 'Outro', thumb: '#10B981',
+    photo: 'https://images.unsplash.com/photo-1598488035139-bdbb2231ce04?w=400&auto=format&fit=crop&q=80',
+    clips: {
+      v1: [{ id: 'tp3c1', label: 'Outro BG', start: 0, duration: 10, color: '#10B981', type: 'video' }],
+      v2: [
+        { id: 'tp3v1', label: 'Subscribe Btn', start: 1, duration: 8, color: '#059669', type: 'video' },
+        { id: 'tp3v2', label: 'Bell Icon',     start: 3, duration: 6, color: '#047857', type: 'video' },
+      ],
+      a1: [{ id: 'tp3a1', label: 'Outro Sting', start: 0, duration: 10, color: '#10B981', type: 'audio' }],
+      sub: [
+        { id: 'tp3s1', label: 'Subscribe',   text: '👆 Click Subscribe below!', start: 1.5, duration: 5, color: '#EF4444', type: 'subtitle', animation: 'Fade In' },
+        { id: 'tp3s2', label: 'Bell',        text: 'Ring the bell 🔔 for every upload', start: 5.5, duration: 4, color: '#EF4444', type: 'subtitle', animation: 'Slide Up' },
+      ],
+    },
+  },
+  {
+    id: 't4', name: 'Channel Outro', cat: 'Outro', thumb: '#06B6D4',
+    photo: 'https://images.unsplash.com/photo-1492691527719-9d1e07e534b4?w=400&auto=format&fit=crop&q=80',
+    clips: {
+      v1: [{ id: 'tp4c1', label: 'End Cards BG', start: 0, duration: 20, color: '#0E7490', type: 'video' }],
+      v2: [
+        { id: 'tp4v1', label: 'Next Video Card', start: 2, duration: 16, color: '#06B6D4', type: 'video' },
+        { id: 'tp4v2', label: 'Playlist Card',   start: 4, duration: 14, color: '#0891B2', type: 'video' },
+      ],
+      a1: [{ id: 'tp4a1', label: 'Outro Music', start: 0, duration: 20, color: '#10B981', type: 'audio' }],
+      sub: [
+        { id: 'tp4s1', label: 'Watch next',   text: '▶ Watch this next', start: 2.5, duration: 6, color: '#EF4444', type: 'subtitle', animation: 'Fade In' },
+        { id: 'tp4s2', label: 'Thanks',       text: 'Thanks for watching! ❤️', start: 16, duration: 3.5, color: '#EF4444', type: 'subtitle', animation: 'Pop' },
+      ],
+    },
+  },
+  {
+    id: 't5', name: 'Name Lower Third', cat: 'Lower Third', thumb: '#F59E0B',
+    photo: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=400&auto=format&fit=crop&q=80',
+    clips: {
+      v2: [{ id: 'tp5v1', label: 'Name Card', start: 0, duration: 5, color: '#F59E0B', type: 'video' }],
+      sub: [
+        { id: 'tp5s1', label: 'Name',  text: 'Creator Name', start: 0.5, duration: 4,   color: '#F59E0B', type: 'subtitle', animation: 'Slide Up' },
+        { id: 'tp5s2', label: 'Title', text: 'Content Creator & Filmmaker', start: 1, duration: 3.5, color: '#D97706', type: 'subtitle', animation: 'Fade In' },
+      ],
+    },
+  },
+  {
+    id: 't6', name: 'Social Bug', cat: 'Lower Third', thumb: '#EF4444',
+    photo: 'https://images.unsplash.com/photo-1526779259212-939e64788e3c?w=400&auto=format&fit=crop&q=80',
+    clips: {
+      v2: [{ id: 'tp6v1', label: 'Social Overlay', start: 0, duration: 6, color: '#EF4444', type: 'video' }],
+      sub: [
+        { id: 'tp6s1', label: 'Handle', text: '@YourHandle', start: 0.5, duration: 5, color: '#EF4444', type: 'subtitle', animation: 'Slide Up' },
+        { id: 'tp6s2', label: 'Follow', text: 'Follow for daily content', start: 1.5, duration: 4, color: '#DC2626', type: 'subtitle', animation: 'Fade In' },
+      ],
+    },
+  },
+  {
+    id: 't7', name: 'Like+Subscribe CTA', cat: 'CTA', thumb: '#8B5CF6',
+    photo: 'https://images.unsplash.com/photo-1553877522-43269d4ea984?w=400&auto=format&fit=crop&q=80',
+    clips: {
+      v2: [
+        { id: 'tp7v1', label: 'Like Button',      start: 0, duration: 4, color: '#8B5CF6', type: 'video' },
+        { id: 'tp7v2', label: 'Subscribe Button', start: 3, duration: 5, color: '#7C3AED', type: 'video' },
+      ],
+      sub: [
+        { id: 'tp7s1', label: 'Like',       text: 'Smash that like button! 👍', start: 0.5, duration: 3, color: '#EF4444', type: 'subtitle', animation: 'Bounce' },
+        { id: 'tp7s2', label: 'Subscribe',  text: 'Subscribe for more! 🔔', start: 3.5, duration: 4, color: '#EF4444', type: 'subtitle', animation: 'Pop' },
+      ],
+    },
+  },
+  {
+    id: 't8', name: 'End Screen', cat: 'CTA', thumb: '#D97706',
+    photo: 'https://images.unsplash.com/photo-1551434678-e076c223a692?w=400&auto=format&fit=crop&q=80',
+    clips: {
+      v1: [{ id: 'tp8c1', label: 'End Screen BG', start: 0, duration: 20, color: '#D97706', type: 'video' }],
+      v2: [
+        { id: 'tp8v1', label: 'Next Video',    start: 2, duration: 16, color: '#F59E0B', type: 'video' },
+        { id: 'tp8v2', label: 'Subscribe Ring', start: 5, duration: 13, color: '#D97706', type: 'video' },
+      ],
+      a1: [{ id: 'tp8a1', label: 'End Music', start: 0, duration: 20, color: '#10B981', type: 'audio' }],
+      sub: [
+        { id: 'tp8s1', label: 'Thanks',      text: 'Thanks for watching! 🙏', start: 1, duration: 4, color: '#EF4444', type: 'subtitle', animation: 'Fade In' },
+        { id: 'tp8s2', label: 'See you',     text: 'See you in the next one! 👋', start: 16, duration: 3.5, color: '#EF4444', type: 'subtitle', animation: 'Slide Up' },
+      ],
+    },
+  },
 ]
 
 export const transitions = [

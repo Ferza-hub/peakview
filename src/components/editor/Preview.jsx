@@ -189,12 +189,30 @@ export default function Preview({
     prevClipId.current = currentClip?.id
   }, [currentClip?.id, activeTransition])
 
+  // Text animation map
+  const TEXT_ANIM = {
+    'Fade In':    'textFadeIn 0.5s ease forwards',
+    'Slide Up':   'textSlideUp 0.45s ease forwards',
+    'Typewriter': 'textFadeIn 0.8s steps(1) forwards',
+    'Pop':        'textPop 0.35s cubic-bezier(0.175,0.885,0.32,1.275) forwards',
+    'Bounce':     'textBounce 0.6s cubic-bezier(0.36,0.07,0.19,0.97) forwards',
+    'Glitch':     'textGlitch 0.4s steps(4) forwards',
+    'Neon':       'textNeon 0.5s ease forwards',
+  }
+
   // Video element sync
   useEffect(() => {
     const v = videoRef.current
     if (!v) return
     if (mediaUrl && v.src !== mediaUrl) v.src = mediaUrl
   }, [mediaUrl])
+
+  // Volume
+  useEffect(() => {
+    const v = videoRef.current
+    if (!v) return
+    v.volume = Math.min(1, Math.max(0, (adjustment?.volume ?? 100) / 100))
+  }, [adjustment?.volume])
 
   useEffect(() => {
     const v = videoRef.current
@@ -245,7 +263,7 @@ export default function Preview({
             <video
               ref={videoRef}
               className="w-full h-full object-contain"
-              muted playsInline crossOrigin="anonymous"
+              playsInline crossOrigin="anonymous"
             />
           ) : (
             <DemoCanvas clip={currentClip} />
@@ -254,7 +272,11 @@ export default function Preview({
 
         {subtitleClip && (
           <div className="absolute bottom-3 left-3 right-3 flex justify-center pointer-events-none">
-            <div className="bg-black/80 text-white text-[11px] px-3 py-1 rounded-md font-medium backdrop-blur-sm">
+            <div
+              key={subtitleClip.id + subtitleClip.animation}
+              className="bg-black/80 text-white text-[11px] px-3 py-1 rounded-md font-medium backdrop-blur-sm"
+              style={subtitleClip.animation ? { animation: TEXT_ANIM[subtitleClip.animation] || TEXT_ANIM['Fade In'] } : undefined}
+            >
               {subtitleClip.text || subtitleClip.label}
             </div>
           </div>

@@ -208,15 +208,19 @@ export default function Dashboard() {
 
   const filtered = projects.filter(p => p.title.toLowerCase().includes(search.toLowerCase()))
 
-  const createProject = () => {
+  const createProject = (template = null) => {
     const id = genId()
     const ts = new Date().toISOString()
-    const p  = { id, title:'Untitled Project', platform:'youtube', color: PALETTE[projects.length % PALETTE.length], duration:'0:00', status:'draft', progress:0, collaborators:0, createdAt:ts, updatedAt:ts }
+    const title = template ? template.name : 'Untitled Project'
+    const p  = { id, title, platform:'youtube', color: template ? (template.thumb || PALETTE[0]) : PALETTE[projects.length % PALETTE.length], duration:'0:00', status:'draft', progress:0, collaborators:0, createdAt:ts, updatedAt:ts }
     upsertProjectMeta(id, p)
-    const emptyTracks = initialTracks.map(t => ({ ...t, clips: [] }))
-    saveProjectData(id, { tracks: emptyTracks, mediaFiles: [], format: '16:9' })
+    const baseTracks = initialTracks.map(t => ({
+      ...t,
+      clips: template?.clips?.[t.id]?.map(c => ({ ...c, id: genId() })) || [],
+    }))
+    saveProjectData(id, { tracks: baseTracks, mediaFiles: [], format: '16:9' })
     setProjects(prev => [p, ...prev])
-    toast.add('Project created', 'success')
+    toast.add(template ? `"${template.name}" project created` : 'Project created', 'success')
     setLastId(id)
     navigate(`/editor/${id}`)
   }
@@ -515,7 +519,7 @@ export default function Dashboard() {
               <p className="text-zinc-500 text-sm mb-6">Start faster with a pre-built project template.</p>
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
                 {templates.map(t => (
-                  <div key={t.id} onClick={createProject}
+                  <div key={t.id} onClick={() => createProject(t)}
                     className="rounded-2xl overflow-hidden border border-[#1A1A1A] hover:border-violet-600/50 cursor-pointer transition-all group">
                     <div className="h-32 relative overflow-hidden bg-black">
                       {t.photo

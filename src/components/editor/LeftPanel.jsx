@@ -125,8 +125,10 @@ export default function LeftPanel({
   mediaFiles, onAddMedia, onUpdateMedia, onDeleteMedia, onAddToTimeline,
   captions, onAddCaption, onUpdateCaption, onDeleteCaption, onGenerateCaptions,
   versionHistory: verHist,
-  onEffectChange,    // called with { type: 'color', filter: cssString, presetId }
-  onTransitionSelect, // called with transition id string
+  onEffectChange,
+  onTransitionSelect,
+  onApplyTemplate,
+  onAnimationSelect,
 }) {
   const toast = useToast()
   const [selectedTransition, setSelectedTransition] = useState(null)
@@ -361,7 +363,7 @@ export default function LeftPanel({
               <div className="grid grid-cols-2 gap-1.5">
                 {templates.map(t => (
                   <div key={t.id}
-                    onClick={() => toast.add(`Template "${t.name}" applied`, 'success')}
+                    onClick={() => onApplyTemplate ? onApplyTemplate(t) : toast.add(`Template "${t.name}" applied`, 'success')}
                     className="rounded-lg overflow-hidden border border-[#1F1F1F] hover:border-violet-500/50 cursor-pointer transition-all group">
                     <div className="h-12 relative overflow-hidden bg-black">
                       {t.photo
@@ -460,8 +462,8 @@ export default function LeftPanel({
               <div className="flex flex-wrap gap-1">
                 {textAnimations.map(a => (
                   <button key={a}
-                    onClick={() => toast.add(`Animation: ${a}`, 'info')}
-                    className="px-2 py-0.5 rounded-full text-[10px] border border-[#2A2A2A] text-zinc-500 hover:text-violet-300 hover:border-violet-500/60 transition-all">{a}</button>
+                    onClick={() => onAnimationSelect ? onAnimationSelect(a) : toast.add(`Animation: ${a}`, 'info')}
+                    className="px-2 py-1.5 rounded-full text-[10px] border border-[#2A2A2A] text-zinc-500 hover:text-violet-300 hover:border-violet-500/60 transition-all">{a}</button>
                 ))}
               </div>
             </>

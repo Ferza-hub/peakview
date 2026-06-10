@@ -45,3 +45,35 @@
   from { opacity: 0; transform: scale(1.03); }
   to   { opacity: 1; transform: scale(1); }
 }
+
+/* Text / subtitle animations */
+@keyframes textFadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+@keyframes textSlideUp {
+  from { opacity: 0; transform: translateY(14px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+@keyframes textPop {
+  0%   { opacity: 0; transform: scale(0.5); }
+  70%  { transform: scale(1.08); }
+  100% { opacity: 1; transform: scale(1); }
+}
+@keyframes textBounce {
+  0%   { opacity: 0; transform: translateY(-20px); }
+  60%  { transform: translateY(6px); }
+  80%  { transform: translateY(-3px); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+@keyframes textGlitch {
+  0%   { opacity: 0; transform: skewX(10deg); filter: hue-rotate(90deg); }
+  25%  { opacity: 1; transform: skewX(-5deg); }
+  50%  { transform: skewX(3deg); filter: hue-rotate(0deg); }
+  100% { opacity: 1; transform: skewX(0); }
+}
+@keyframes textNeon {
+  0%   { opacity: 0; text-shadow: 0 0 0 transparent; }
+  60%  { opacity: 1; text-shadow: 0 0 8px #a78bfa, 0 0 20px #7c3aed; }
+  100% { opacity: 1; text-shadow: 0 0 4px #a78bfa; }
+}

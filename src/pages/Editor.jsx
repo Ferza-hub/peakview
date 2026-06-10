@@ -216,6 +216,36 @@ export default function Editor() {
     toast.add('Clip deleted', 'error')
   }, [confirmDel, tracks, mediaFiles, commit, selectedClip, toast])
 
+  const applyTemplate = useCallback((template) => {
+    if (!template.clips) { toast.add(`"${template.name}" applied`, 'success'); return }
+    const newTracks = tracks.map(t => ({
+      ...t,
+      clips: (template.clips[t.id] || []).map(c => ({ ...c, id: genId() })),
+    }))
+    commit(newTracks, mediaFiles)
+    toast.add(`"${template.name}" template applied`, 'success')
+  }, [tracks, mediaFiles, commit, toast])
+
+  const setClipAnimation = useCallback((animName) => {
+    if (selectedClip) {
+      const newTracks = tracks.map(t => ({
+        ...t,
+        clips: t.clips.map(c => c.id === selectedClip.id ? { ...c, animation: animName } : c),
+      }))
+      commit(newTracks, mediaFiles)
+      toast.add(`"${animName}" applied to clip`, 'success')
+    } else {
+      const subTrack = tracks.find(t => t.id === 'sub')
+      if (!subTrack || subTrack.locked) { toast.add('Select a clip or unlock the subtitle track', 'warning'); return }
+      const last = subTrack.clips[subTrack.clips.length - 1]
+      const start = last ? last.start + last.duration + 0.5 : currentTime
+      const newClip = { id: genId(), label: 'Text Clip', text: 'Your text here', start, duration: 3, color: '#F59E0B', type: 'subtitle', animation: animName }
+      const newTracks = tracks.map(t => t.id === 'sub' ? { ...t, clips: [...t.clips, newClip] } : t)
+      commit(newTracks, mediaFiles)
+      toast.add(`New "${animName}" text clip added`, 'success')
+    }
+  }, [selectedClip, tracks, currentTime, mediaFiles, commit, toast])
+
   const addMediaToTimeline = useCallback((item) => {
     const map = { video:'v1', audio:'a1', image:'v2', subtitle:'sub' }
     const tId = map[item.type] || 'v1'
@@ -303,6 +333,8 @@ export default function Editor() {
           versionHistory={versionHistory}
           onEffectChange={({ filter }) => setColorFilter(filter)}
           onTransitionSelect={setActiveTransition}
+          onApplyTemplate={applyTemplate}
+          onAnimationSelect={setClipAnimation}
         />
 
         <div className="flex-1 flex flex-col overflow-hidden min-w-0">
