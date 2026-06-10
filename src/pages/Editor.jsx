@@ -177,9 +177,20 @@ export default function Editor() {
   }, [mediaFiles, tracks, commit, toast])
 
   // ── Clip CRUD ──────────────────────────────────────────────────────────────
-  const addClip = useCallback((trackId, clip) => {
+  const addClip = useCallback((trackId, clip, mediaItem) => {
     const newTracks = tracks.map(t => t.id === trackId ? { ...t, clips: [...t.clips, clip] } : t)
-    commit(newTracks, mediaFiles)
+    let newMedia = mediaFiles
+    if (mediaItem && !mediaFiles.some(m => m.id === mediaItem.id)) {
+      newMedia = [...mediaFiles, {
+        id: mediaItem.id,
+        name: mediaItem.name,
+        type: mediaItem.type || 'video',
+        duration: mediaItem.duration,
+        color: mediaItem.color || '#7C3AED',
+        ...(mediaItem.thumb ? { thumb: mediaItem.thumb } : {}),
+      }]
+    }
+    commit(newTracks, newMedia)
   }, [tracks, mediaFiles, commit])
 
   const updateTracks = useCallback((newTracks) => {
@@ -312,7 +323,7 @@ export default function Editor() {
         <RightPanel selectedClip={selectedClip} format={format} setFormat={setFormat} />
       </div>
 
-      {showExport  && <ExportModal  onClose={() => setShowExport(false)} />}
+      {showExport  && <ExportModal  onClose={() => setShowExport(false)} projectName={projectName} format={format} />}
       {showPublish && <PublishModal onClose={() => setShowPublish(false)} />}
 
       {confirmDel && (

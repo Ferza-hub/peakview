@@ -33,44 +33,33 @@ const PROJECT_IMGS = [
 ]
 
 // ── Animated canvas thumbnail for project cards ─────────────────────────────
-function ProjectThumb({ color, title }) {
+function ProjectThumb({ color, title, thumb }) {
   const canvasRef = useRef(null)
   const animRef   = useRef(null)
   const seed      = [...title].reduce((a, c) => a + c.charCodeAt(0), 0)
-  const imgUrl    = PROJECT_IMGS[seed % PROJECT_IMGS.length]
 
   useEffect(() => {
+    if (!thumb) return
     const canvas = canvasRef.current
     if (!canvas) return
     const ctx = canvas.getContext('2d')
     let t = 0
-
     const render = () => {
       t += 0.018
       const { width: w, height: h } = canvas
       ctx.clearRect(0, 0, w, h)
-
-      // floating particles
       for (let i = 0; i < 6; i++) {
         const px = ((seed * (i + 1) * 137.5) % w)
         const py = ((seed * (i + 1) * 97.3)  % h)
         const r  = 1.2 + Math.sin(t * 0.8 + i * 1.1) * 0.6
         ctx.beginPath()
-        ctx.arc(
-          px + Math.sin(t * 0.6 + i * 0.9) * 10,
-          py + Math.cos(t * 0.4 + i * 1.2) * 7,
-          r, 0, Math.PI * 2
-        )
+        ctx.arc(px + Math.sin(t * 0.6 + i * 0.9) * 10, py + Math.cos(t * 0.4 + i * 1.2) * 7, r, 0, Math.PI * 2)
         ctx.fillStyle = `rgba(255,255,255,${0.15 + Math.sin(t + i) * 0.06})`
         ctx.fill()
       }
-
-      // scan line
       const scanY = ((t * 25) % (h + 2)) - 1
       ctx.fillStyle = 'rgba(255,255,255,0.018)'
       ctx.fillRect(0, scanY, w, 2)
-
-      // corner viewfinder brackets
       const bl = 10
       ctx.strokeStyle = color + 'cc'
       ctx.lineWidth = 1.5
@@ -78,33 +67,30 @@ function ProjectThumb({ color, title }) {
         const dx = x===0?bl:-bl, dy = y===0?bl:-bl
         ctx.beginPath(); ctx.moveTo(x+dx,y); ctx.lineTo(x,y); ctx.lineTo(x,y+dy); ctx.stroke()
       })
-
       animRef.current = requestAnimationFrame(render)
     }
-
     render()
     return () => { if (animRef.current) cancelAnimationFrame(animRef.current) }
-  }, [color, title, seed])
+  }, [color, title, seed, thumb])
+
+  if (!thumb) {
+    return (
+      <div className="w-full h-full flex items-center justify-center relative overflow-hidden"
+        style={{ background: `linear-gradient(135deg, ${color}18, #0A0A0A 70%)` }}>
+        <div className="absolute top-0 left-0 right-0 h-0.5" style={{ backgroundColor: color + '70' }} />
+        <div className="flex flex-col items-center gap-2 opacity-30">
+          <Film size={28} className="text-zinc-300" />
+          <span className="text-[9px] text-zinc-400 tracking-widest uppercase font-medium">No media</span>
+        </div>
+      </div>
+    )
+  }
 
   return (
     <div className="w-full h-full relative overflow-hidden bg-black">
-      <img
-        src={imgUrl}
-        alt=""
-        className="absolute inset-0 w-full h-full object-cover"
-        style={{ filter: 'brightness(0.65) saturate(1.15)' }}
-        loading="lazy"
-      />
-      <div
-        className="absolute inset-0"
-        style={{ background: `linear-gradient(135deg, ${color}40 0%, transparent 55%, ${color}20 100%)` }}
-      />
-      <canvas
-        ref={canvasRef}
-        width={320}
-        height={180}
-        className="absolute inset-0 w-full h-full block"
-      />
+      <img src={thumb} alt="" className="absolute inset-0 w-full h-full object-cover" style={{ filter: 'brightness(0.65) saturate(1.15)' }} loading="lazy" />
+      <div className="absolute inset-0" style={{ background: `linear-gradient(135deg, ${color}40 0%, transparent 55%, ${color}20 100%)` }} />
+      <canvas ref={canvasRef} width={320} height={180} className="absolute inset-0 w-full h-full block" />
     </div>
   )
 }
@@ -217,7 +203,7 @@ export default function Dashboard() {
     upsertProjectMeta(id, p)
     const emptyTracks = initialTracks.map(t => ({ ...t, clips: [] }))
     saveProjectData(id, { tracks: emptyTracks, mediaFiles: [], format: '16:9' })
-    setProjects(prev => [...prev, p])
+    setProjects(prev => [p, ...prev])
     toast.add('Project created', 'success')
     setLastId(id)
     navigate(`/editor/${id}`)
@@ -375,6 +361,8 @@ export default function Dashboard() {
                 {filtered.map(p => {
                   const pm    = PM[p.platform] || PM.youtube
                   const isRen = renamingId === p.id
+                  const pData = getProjectData(p.id)
+                  const firstThumb = pData?.mediaFiles?.find(m => m.thumb)?.thumb || null
                   return (
                     <div key={p.id}
                       className="rounded-2xl overflow-hidden border border-[#1A1A1A] hover:border-[#2A2A2A] cursor-pointer transition-all group relative"
@@ -383,7 +371,7 @@ export default function Dashboard() {
 
                       {/* Animated thumbnail */}
                       <div className="aspect-video relative overflow-hidden">
-                        <ProjectThumb color={p.color} title={p.title} />
+                        <ProjectThumb color={p.color} title={p.title} thumb={firstThumb} />
 
                         {/* Play overlay on hover */}
                         <div className={`absolute inset-0 bg-black/50 flex items-center justify-center transition-opacity duration-200 ${hover === p.id && !isRen ? 'opacity-100' : 'opacity-0'}`}>

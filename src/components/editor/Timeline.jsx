@@ -159,7 +159,7 @@ export default function Timeline({
       duration: parseDur(media.duration),
       color: media.color || '#7C3AED',
       type: media.type, mediaId: media.id,
-    })
+    }, media)
   }
 
   return (

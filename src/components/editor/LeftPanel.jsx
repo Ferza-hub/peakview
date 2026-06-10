@@ -1,6 +1,6 @@
 import { useState, useRef } from 'react'
 import {
-  FolderOpen, LayoutTemplate, Type, Music, Sparkles, Cpu, Package, Users,
+  FolderOpen, LayoutTemplate, Type, Music, Sparkles, Cpu, Package,
   Plus, Search, Play, Check, Pencil, Trash2, X, Mic, Globe, RefreshCw, Zap,
   Film, Image as ImgIcon, FileText, Volume2 as Vol2
 } from 'lucide-react'
@@ -23,7 +23,6 @@ const TABS = [
   { id: 'effects',   icon: Sparkles,       label: 'Effects'   },
   { id: 'ai',        icon: Cpu,            label: 'AI Tools'  },
   { id: 'stock',     icon: Package,        label: 'Stock'     },
-  { id: 'collab',    icon: Users,          label: 'Collab'    },
 ]
 
 const TYPE_ICON = { video: Film, audio: Vol2, image: ImgIcon, subtitle: FileText }
@@ -516,7 +515,7 @@ export default function LeftPanel({
                 {stockFootage.map(f => (
                   <div key={f.id}
                     draggable
-                    onDragStart={e => e.dataTransfer.setData('application/peakedit-media', JSON.stringify({ id: f.id, name: f.name, type: 'video', duration: f.duration, color: '#7C3AED' }))}
+                    onDragStart={e => e.dataTransfer.setData('application/peakedit-media', JSON.stringify({ id: f.id, name: f.name, type: 'video', duration: f.duration, color: '#7C3AED', thumb: f.thumb }))}
                     className="flex items-center gap-2 px-2 py-1.5 rounded-lg bg-[#141414] border border-[#1F1F1F] hover:border-[#2A2A2A] cursor-grab transition-all">
                     <div className="w-10 h-7 rounded-md overflow-hidden shrink-0 bg-zinc-800">
                       {f.thumb
@@ -549,55 +548,6 @@ export default function LeftPanel({
             </>
           )}
 
-          {/* ─── COLLAB ───────────────────────────────────── */}
-          {activeTab === 'collab' && (
-            <>
-              <SLabel>Team ({(collaborators||[]).length})</SLabel>
-              <div className="flex flex-col gap-1.5 mb-3">
-                {(collaborators||[]).map(c => (
-                  <div key={c.id} className="flex items-center gap-2 px-2 py-1.5 rounded-lg bg-[#141414] border border-[#1F1F1F]">
-                    <div className="w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold text-white shrink-0" style={{ background: c.color }}>
-                      {c.name[0]}
-                    </div>
-                    <div className="flex-1">
-                      <p className="text-[11px] text-zinc-300">{c.name}</p>
-                      <div className="flex items-center gap-1">
-                        <div className={`w-1.5 h-1.5 rounded-full ${c.online ? 'bg-emerald-400' : 'bg-zinc-600'}`} />
-                        <p className="text-[9px] text-zinc-600">{c.online ? 'Online' : 'Offline'}</p>
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-              <SLabel>Comments ({(comments||[]).length})</SLabel>
-              <div className="flex flex-col gap-1.5 mb-3">
-                {(comments||[]).map(c => (
-                  <div key={c.id} className="px-2 py-1.5 rounded-lg bg-[#141414] border border-[#1F1F1F]">
-                    <div className="flex items-center gap-1.5 mb-0.5">
-                      <div className="w-4 h-4 rounded-full flex items-center justify-center text-[9px] font-bold text-white shrink-0" style={{ background: c.color }}>{c.user[0]}</div>
-                      <span className="text-[10px] font-medium text-zinc-300">{c.user}</span>
-                      <span className="text-[9px] text-zinc-600 ml-auto">{c.time}</span>
-                    </div>
-                    <p className="text-[11px] text-zinc-400 leading-snug">{c.text}</p>
-                  </div>
-                ))}
-              </div>
-              <SLabel>Version History</SLabel>
-              <div className="flex flex-col gap-1">
-                {(verHist||[]).map(v => (
-                  <div key={v.id}
-                    onClick={() => toast.add(`Restored: ${v.label}`, 'success')}
-                    className="flex items-center gap-2 px-2 py-1.5 rounded-lg bg-[#141414] border border-[#1F1F1F] cursor-pointer hover:border-violet-500/50 hover:bg-violet-950/20 transition-all">
-                    <div className="w-1.5 h-1.5 rounded-full bg-violet-400 shrink-0" />
-                    <div className="flex-1 min-w-0">
-                      <p className="text-[11px] text-zinc-300 truncate">{v.label}</p>
-                      <p className="text-[9px] text-zinc-600">{v.time} · {v.author}</p>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </>
-          )}
         </div>
       </div>
 
