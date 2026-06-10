@@ -41,6 +41,7 @@ export default function Editor() {
   const [confirmDel, setConfirmDel]   = useState(null)
   const [colorFilter, setColorFilter] = useState('')
   const [activeTransition, setActiveTransition] = useState(null)
+  const [adjustment, setAdjustment] = useState({ brightness:100, contrast:100, saturation:100, x:0, y:0, scale:100, rotation:0, volume:100 })
 
   // Load project
   useEffect(() => {
@@ -312,6 +313,8 @@ export default function Editor() {
             totalDuration={TOTAL_DURATION} selectedClip={selectedClip} format={format}
             mediaFiles={mediaFiles}
             colorFilter={colorFilter}
+            adjustment={adjustment}
+            activeTransition={activeTransition}
           />
           <Timeline
             tracks={tracks} currentTime={currentTime} setCurrentTime={setCurrentTime}
@@ -323,7 +326,7 @@ export default function Editor() {
           />
         </div>
 
-        <RightPanel selectedClip={selectedClip} format={format} setFormat={setFormat} />
+        <RightPanel selectedClip={selectedClip} format={format} setFormat={setFormat} onAdjust={setAdjustment} />
       </div>
 
       {showExport  && <ExportModal  onClose={() => setShowExport(false)} projectName={projectName} format={format} />}

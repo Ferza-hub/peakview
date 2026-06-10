@@ -1,17 +1,43 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { Palette, Move, Volume2 } from 'lucide-react'
 
-export default function RightPanel({ selectedClip, format, setFormat }) {
-  const [transform, setTransform] = useState({ X: '0', Y: '0', Scale: '100', Rotation: '0' })
+export default function RightPanel({ selectedClip, format, setFormat, onAdjust }) {
+  const [transform, setTransform] = useState({ X: 0, Y: 0, Scale: 100, Rotation: 0 })
   const [color, setColor]         = useState({ Brightness: 100, Contrast: 100, Saturation: 100 })
   const [volume, setVolume]       = useState(100)
 
+  const emit = useCallback((c, tr, v) => {
+    onAdjust?.({
+      brightness: c.Brightness, contrast: c.Contrast, saturation: c.Saturation,
+      x: tr.X, y: tr.Y, scale: tr.Scale, rotation: tr.Rotation, volume: v,
+    })
+  }, [onAdjust])
+
   // reset when clip selection changes
   useEffect(() => {
-    setTransform({ X: '0', Y: '0', Scale: '100', Rotation: '0' })
-    setColor({ Brightness: 100, Contrast: 100, Saturation: 100 })
-    setVolume(100)
+    const c  = { Brightness: 100, Contrast: 100, Saturation: 100 }
+    const tr = { X: 0, Y: 0, Scale: 100, Rotation: 0 }
+    const v  = 100
+    setTransform(tr); setColor(c); setVolume(v)
+    emit(c, tr, v)
   }, [selectedClip?.id])
+
+  const handleColor = (k, v) => {
+    const next = { ...color, [k]: v }
+    setColor(next)
+    emit(next, transform, volume)
+  }
+
+  const handleTransform = (k, v) => {
+    const next = { ...transform, [k]: v }
+    setTransform(next)
+    emit(color, next, volume)
+  }
+
+  const handleVolume = (v) => {
+    setVolume(v)
+    emit(color, transform, v)
+  }
 
   return (
     <div className="w-52 shrink-0 bg-[#111111] border-l border-[#1F1F1F] flex flex-col overflow-y-auto">
@@ -29,19 +55,21 @@ export default function RightPanel({ selectedClip, format, setFormat }) {
           <section>
             <p className="panel-label flex items-center gap-1.5"><Move size={10} /> Transform</p>
             {[
-              { k: 'X',        suffix: 'px'  },
-              { k: 'Y',        suffix: 'px'  },
-              { k: 'Scale',    suffix: '%'   },
-              { k: 'Rotation', suffix: '°'   },
-            ].map(({ k, suffix }) => (
-              <div key={k} className="flex items-center gap-2 mb-1.5">
-                <span className="field-label w-14 mb-0">{k}</span>
+              { k: 'X',        suffix: 'px', min: -500, max: 500 },
+              { k: 'Y',        suffix: 'px', min: -500, max: 500 },
+              { k: 'Scale',    suffix: '%',  min: 10,   max: 300 },
+              { k: 'Rotation', suffix: '°',  min: -180, max: 180 },
+            ].map(({ k, suffix, min, max }) => (
+              <div key={k} className="mb-2">
+                <div className="flex justify-between mb-1">
+                  <span className="field-label mb-0">{k}</span>
+                  <span className="text-[10px] text-zinc-400">{transform[k]}{suffix}</span>
+                </div>
                 <input
-                  value={transform[k]}
-                  onChange={e => setTransform(p => ({ ...p, [k]: e.target.value }))}
-                  className="input-dark flex-1"
+                  type="range" min={min} max={max} value={transform[k]}
+                  onChange={e => handleTransform(k, Number(e.target.value))}
+                  className="w-full accent-violet-500"
                 />
-                <span className="text-[10px] text-zinc-600">{suffix}</span>
               </div>
             ))}
           </section>
@@ -56,7 +84,7 @@ export default function RightPanel({ selectedClip, format, setFormat }) {
                 </div>
                 <input
                   type="range" min={0} max={200} value={color[l]}
-                  onChange={e => setColor(p => ({ ...p, [l]: Number(e.target.value) }))}
+                  onChange={e => handleColor(l, Number(e.target.value))}
                   className="w-full accent-violet-500"
                 />
               </div>
@@ -73,7 +101,7 @@ export default function RightPanel({ selectedClip, format, setFormat }) {
                 </div>
                 <input
                   type="range" min={0} max={150} value={volume}
-                  onChange={e => setVolume(Number(e.target.value))}
+                  onChange={e => handleVolume(Number(e.target.value))}
                   className="w-full accent-violet-500"
                 />
               </div>

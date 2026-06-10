@@ -1,4 +1,4 @@
-import { useRef, useEffect, useMemo } from 'react'
+import { useRef, useEffect, useMemo, useState } from 'react'
 import { Play, Pause, SkipBack, SkipForward, Volume2 } from 'lucide-react'
 import { fmtTime } from '../../utils/helpers'
 import { getBlobUrl } from '../../utils/fileRegistry'
@@ -132,9 +132,11 @@ export default function Preview({
   tracks, playing, setPlaying,
   currentTime, setCurrentTime,
   totalDuration, selectedClip, format,
-  mediaFiles, colorFilter,
+  mediaFiles, colorFilter, adjustment, activeTransition,
 }) {
-  const videoRef = useRef(null)
+  const videoRef   = useRef(null)
+  const prevClipId = useRef(null)
+  const [transKey, setTransKey] = useState(0)
 
   const fmtStyle = FORMAT_STYLE[format] || FORMAT_STYLE['16:9']
   const fmtLabel = FORMAT_LABEL[format] || format
@@ -157,6 +159,35 @@ export default function Preview({
     if (!sub) return null
     return sub.clips.find(c => currentTime >= c.start && currentTime < c.start + c.duration) || null
   }, [tracks, currentTime])
+
+  // Compute combined CSS filter from preset + per-clip adjustments
+  const combinedFilter = useMemo(() => {
+    const parts = []
+    if (colorFilter) parts.push(colorFilter)
+    if (adjustment) {
+      const { brightness: b = 100, contrast: c = 100, saturation: s = 100 } = adjustment
+      if (b !== 100 || c !== 100 || s !== 100)
+        parts.push(`brightness(${b/100}) contrast(${c/100}) saturate(${s/100})`)
+    }
+    return parts.join(' ') || 'none'
+  }, [colorFilter, adjustment])
+
+  // Compute CSS transform from adjustment
+  const combinedTransform = useMemo(() => {
+    if (!adjustment) return ''
+    const { x = 0, y = 0, scale = 100, rotation = 0 } = adjustment
+    if (x === 0 && y === 0 && scale === 100 && rotation === 0) return ''
+    return `translate(${x}px, ${y}px) scale(${scale/100}) rotate(${rotation}deg)`
+  }, [adjustment])
+
+  // Transition animation — bump key when clip changes and a transition is active
+  useEffect(() => {
+    if (!activeTransition) { prevClipId.current = currentClip?.id; return }
+    if (prevClipId.current !== null && prevClipId.current !== currentClip?.id) {
+      setTransKey(k => k + 1)
+    }
+    prevClipId.current = currentClip?.id
+  }, [currentClip?.id, activeTransition])
 
   // Video element sync
   useEffect(() => {
@@ -201,16 +232,25 @@ export default function Preview({
         className="relative rounded-lg overflow-hidden border border-[#1F1F1F] shadow-2xl flex-shrink-0 bg-black"
         style={fmtStyle}
       >
-        {mediaUrl ? (
-          <video
-            ref={videoRef}
-            className="w-full h-full object-contain"
-            muted playsInline crossOrigin="anonymous"
-            style={{ filter: colorFilter || 'none' }}
-          />
-        ) : (
-          <DemoCanvas clip={currentClip} style={{ filter: colorFilter || 'none' }} />
-        )}
+        <div
+          key={transKey}
+          className="w-full h-full"
+          style={{
+            filter: combinedFilter,
+            transform: combinedTransform || undefined,
+            animation: transKey > 0 ? `previewTransIn 0.35s ease` : undefined,
+          }}
+        >
+          {mediaUrl ? (
+            <video
+              ref={videoRef}
+              className="w-full h-full object-contain"
+              muted playsInline crossOrigin="anonymous"
+            />
+          ) : (
+            <DemoCanvas clip={currentClip} />
+          )}
+        </div>
 
         {subtitleClip && (
           <div className="absolute bottom-3 left-3 right-3 flex justify-center pointer-events-none">
@@ -237,7 +277,7 @@ export default function Preview({
           </div>
         )}
 
-        {colorFilter && (
+        {(colorFilter || (adjustment && (adjustment.brightness !== 100 || adjustment.contrast !== 100 || adjustment.saturation !== 100))) && (
           <div className="absolute bottom-2 right-2 bg-violet-900/70 text-violet-300 text-[9px] px-1.5 py-0.5 rounded font-mono">
             FX
           </div>
